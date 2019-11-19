@@ -115,6 +115,9 @@ local dirs = {"up","right","down","left"}
 local bag = {"I","O","T","S","Z","J","L"}
 local smallfont = draw.CreateFont("Bahnschrift", 15)
 local font = draw.CreateFont("Bahnschrift Bold", 25)
+local icons = draw.CreateFont("Webdings", 30)
+local ref = gui.Reference("Misc", "GENERAL", "Main")
+local gameopened = gui.Checkbox(ref, active, "Tetris", 1)
 
 local keys = {
 	moveright = 39,
@@ -805,6 +808,9 @@ local function game()
 			settingswindow:SetActive(0)
 			settingstoggle = false
 		end
+		if not gameopened:GetValue() then
+			paused = true
+		end
 		local dt = globals.AbsoluteFrameTime()
 		local speedup = false
 		tspin = false
@@ -1072,387 +1078,404 @@ callbacks.Register("Draw", animations)
 
 local function drawing()
 
-local mx, my = input.GetMousePos()
-local misclick = false
+if gameopened:GetValue() then
+	local mx, my = input.GetMousePos()
+	local misclick = false
 
---handle moving the board
-local left_mouse_down = input.IsButtonDown(1);
+	--handle moving the board
+	local left_mouse_down = input.IsButtonDown(1);
 
-	if (is_dragging == true and left_mouse_down == false) then
-		is_dragging = false;
-		dragging_offset_x = 0;
-		dragging_offset_y = 0;
-	end
-	
-	if (left_mouse_down) then
-		dragHandler();
-	end
+		if (is_dragging == true and left_mouse_down == false) then
+			is_dragging = false;
+			dragging_offset_x = 0;
+			dragging_offset_y = 0;
+		end
+		
+		if (left_mouse_down) then
+			dragHandler();
+		end
 
---draw the board
-draw.Color(25,25,25,255)
-draw.FilledRect(boardx, boardy + 104, boardx + 270, boardy + 634)
-	for x, line in ipairs(board) do
-		for y, pos in ipairs(line) do
-			if pos.block and not paused then
-				draw.Color(pos.color[1], pos.color[2], pos.color[3], 255)
-			else	
-				draw.Color(50,50,50,255)
-			end
-			if y >= 5 or (pos.block and y == 4) then
-				draw.RoundedRectFill(boardx + ((x - 1) + 5) + ((x - 1) * 25),
-								boardy + ((y - 1) + 5) + ((y - 1) * 25),
-								boardx + ((x - 1) + 5) + ((x - 1) * 25) + 25,
-								boardy + ((y - 1) + 5) + ((y - 1) * 25) + 25)
-			end
-		end
-	end
-	
-	--ghost piece at bottom
-	if currpiece ~= nil and not paused and gui.GetValue("ghostbox") then
-		for i, block in ipairs(currpiece.blocks[dir]) do
-			if block[1] + ghostpos.y >= 4 then
-				draw.Color(currpiece.color[1],currpiece.color[2],currpiece.color[3],25)				
-				draw.RoundedRectFill(boardx + ((block[2] + ghostpos.x - 1) + 5) + ((block[2] + ghostpos.x - 1) * 25) + 1,
-								boardy + ((block[1] + ghostpos.y - 1) + 5) + ((block[1] + ghostpos.y - 1) * 25) + 1,
-								boardx + ((block[2] + ghostpos.x - 1) + 5) + ((block[2] + ghostpos.x - 1) * 25) + 25 - 1,
-								boardy + ((block[1] + ghostpos.y - 1) + 5) + ((block[1] + ghostpos.y - 1) * 25) + 25 - 1)
-			
-				draw.Color(currpiece.color[1],currpiece.color[2],currpiece.color[3],255)
-				draw.RoundedRect(boardx + ((block[2] + ghostpos.x - 1) + 5) + ((block[2] + ghostpos.x - 1) * 25),
-								boardy + ((block[1] + ghostpos.y - 1) + 5) + ((block[1] + ghostpos.y - 1) * 25),
-								boardx + ((block[2] + ghostpos.x - 1) + 5) + ((block[2] + ghostpos.x - 1) * 25) + 25,
-								boardy + ((block[1] + ghostpos.y - 1) + 5) + ((block[1] + ghostpos.y - 1) * 25) + 25)
-			end
-		end
-	end
-	
-	--our active piece
-	if currpiece ~=  nil and not paused then
-		draw.Color(currpiece.color[1],currpiece.color[2],currpiece.color[3],palpha)
-		for i, block in ipairs(currpiece.blocks[dir]) do
-			if block[1] + currpos.y >= 4 then
-				draw.RoundedRectFill(boardx + ((block[2] + currpos.x - 1) + 5) + ((block[2] + currpos.x - 1) * 25),
-								boardy + ((block[1] + currpos.y - 1) + 5) + ((block[1] + currpos.y - 1) * 25),
-								boardx + ((block[2] + currpos.x - 1) + 5) + ((block[2] + currpos.x - 1) * 25) + 25,
-								boardy + ((block[1] + currpos.y - 1) + 5) + ((block[1] + currpos.y - 1) * 25) + 25)
-			end
-		end
-	end
-	
-	if lost or paused then
-		draw.Color(0,0,0,150)
-		draw.FilledRect(boardx - 20, boardy + 75, boardx + 300, boardy + 650)
-	end
-	
-	--draw the home screen
-	if homescreen and helpscreen == 0 then
-		draw.SetTexture(homescreentexture)
-		draw.Color(255,255,255,255)
-		draw.FilledRect(boardx - 1, boardy + 104, boardx + 269, boardy + 633)
-		draw.SetFont(font)
-		for i, score in ipairs(highscores) do
-			draw.Text(boardx + 135 - draw.GetTextSize(highscores[i]) / 2, boardy + 404 + i * 24, highscores[i])
-		end
-		if inRect(mx,my,boardx + 36, boardy + 283, boardx + 36 + 196, boardy + 283 + 56) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(playclicktexture)
-			else
-				draw.SetTexture(playhovertexture)
-			end
-			draw.FilledRect(boardx + 36, boardy + 283, boardx + 36 + 196, boardy + 283 + 56)
-			if input.IsButtonReleased(1) then
-				level = levelmod
-				steptime = (0.8-((level-1)*0.007))^(level-1)
-				steptime = math.floor(steptime*100000)/100000
-				homescreen = false
-			end
-		end
-		if inRect(mx,my,boardx + 46, boardy + 345, boardx + 46 + 176, boardy + 345 + 48) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(levelclicktexture)
-			else
-				draw.SetTexture(levelhovertexture)
-			end
-			draw.FilledRect(boardx + 46, boardy + 345, boardx + 46 + 176, boardy + 345 + 48)
-			if input.IsButtonReleased(1) then
-				if levelmod == 1 then
-					levelmod = 5
-				elseif levelmod == 5 then
-					levelmod = 10
-				elseif levelmod == 10 then
-					levelmod = 15
-				elseif levelmod == 15 then
-					levelmod = 1
+	--draw the board
+	draw.Color(25,25,25,255)
+	draw.FilledRect(boardx, boardy + 104, boardx + 270, boardy + 634)
+		for x, line in ipairs(board) do
+			for y, pos in ipairs(line) do
+				if pos.block and not paused then
+					draw.Color(pos.color[1], pos.color[2], pos.color[3], 255)
+				else	
+					draw.Color(50,50,50,255)
+				end
+				if y >= 5 or (pos.block and y == 4) then
+					draw.RoundedRectFill(boardx + ((x - 1) + 5) + ((x - 1) * 25),
+									boardy + ((y - 1) + 5) + ((y - 1) * 25),
+									boardx + ((x - 1) + 5) + ((x - 1) * 25) + 25,
+									boardy + ((y - 1) + 5) + ((y - 1) * 25) + 25)
 				end
 			end
 		end
-		draw.Text(boardx + 134 - (draw.GetTextSize("LEVEL: " .. levelmod) / 2), boardy + 355, "LEVEL: " .. levelmod)
-		if inRect(mx,my,boardx + 53, boardy + 565, boardx + 53 + 76, boardy + 565 + 56) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(settingsclicktexture)
-			else
-				draw.SetTexture(settingshovertexture)
+		
+		--ghost piece at bottom
+		if currpiece ~= nil and not paused and gui.GetValue("ghostbox") then
+			for i, block in ipairs(currpiece.blocks[dir]) do
+				if block[1] + ghostpos.y >= 4 then
+					draw.Color(currpiece.color[1],currpiece.color[2],currpiece.color[3],25)				
+					draw.RoundedRectFill(boardx + ((block[2] + ghostpos.x - 1) + 5) + ((block[2] + ghostpos.x - 1) * 25) + 1,
+									boardy + ((block[1] + ghostpos.y - 1) + 5) + ((block[1] + ghostpos.y - 1) * 25) + 1,
+									boardx + ((block[2] + ghostpos.x - 1) + 5) + ((block[2] + ghostpos.x - 1) * 25) + 25 - 1,
+									boardy + ((block[1] + ghostpos.y - 1) + 5) + ((block[1] + ghostpos.y - 1) * 25) + 25 - 1)
+				
+					draw.Color(currpiece.color[1],currpiece.color[2],currpiece.color[3],255)
+					draw.RoundedRect(boardx + ((block[2] + ghostpos.x - 1) + 5) + ((block[2] + ghostpos.x - 1) * 25),
+									boardy + ((block[1] + ghostpos.y - 1) + 5) + ((block[1] + ghostpos.y - 1) * 25),
+									boardx + ((block[2] + ghostpos.x - 1) + 5) + ((block[2] + ghostpos.x - 1) * 25) + 25,
+									boardy + ((block[1] + ghostpos.y - 1) + 5) + ((block[1] + ghostpos.y - 1) * 25) + 25)
+				end
 			end
-			draw.FilledRect(boardx + 53, boardy + 565, boardx + 53 + 76, boardy + 565 + 56)
-			if input.IsButtonReleased(1) then
-				if not settingstoggle then
-					settingswindow:SetActive(1)
-					settingstoggle = true
+		end
+		
+		--our active piece
+		if currpiece ~=  nil and not paused then
+			draw.Color(currpiece.color[1],currpiece.color[2],currpiece.color[3],palpha)
+			for i, block in ipairs(currpiece.blocks[dir]) do
+				if block[1] + currpos.y >= 4 then
+					draw.RoundedRectFill(boardx + ((block[2] + currpos.x - 1) + 5) + ((block[2] + currpos.x - 1) * 25),
+									boardy + ((block[1] + currpos.y - 1) + 5) + ((block[1] + currpos.y - 1) * 25),
+									boardx + ((block[2] + currpos.x - 1) + 5) + ((block[2] + currpos.x - 1) * 25) + 25,
+									boardy + ((block[1] + currpos.y - 1) + 5) + ((block[1] + currpos.y - 1) * 25) + 25)
+				end
+			end
+		end
+		
+		if lost or paused then
+			draw.Color(0,0,0,150)
+			draw.FilledRect(boardx - 20, boardy + 75, boardx + 300, boardy + 650)
+		end
+		
+		--draw the home screen
+		if homescreen and helpscreen == 0 then
+			draw.SetTexture(homescreentexture)
+			draw.Color(255,255,255,255)
+			draw.FilledRect(boardx - 1, boardy + 104, boardx + 269, boardy + 633)
+			draw.SetFont(font)
+			for i, score in ipairs(highscores) do
+				draw.Text(boardx + 135 - draw.GetTextSize(highscores[i]) / 2, boardy + 404 + i * 24, highscores[i])
+			end
+			if inRect(mx,my,boardx + 36, boardy + 283, boardx + 36 + 196, boardy + 283 + 56) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(playclicktexture)
 				else
-					settingswindow:SetActive(0)
-					settingstoggle = false
+					draw.SetTexture(playhovertexture)
+				end
+				draw.FilledRect(boardx + 36, boardy + 283, boardx + 36 + 196, boardy + 283 + 56)
+				if input.IsButtonReleased(1) then
+					level = levelmod
+					steptime = (0.8-((level-1)*0.007))^(level-1)
+					steptime = math.floor(steptime*100000)/100000
+					homescreen = false
+				end
+			end
+			if inRect(mx,my,boardx + 46, boardy + 345, boardx + 46 + 176, boardy + 345 + 48) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(levelclicktexture)
+				else
+					draw.SetTexture(levelhovertexture)
+				end
+				draw.FilledRect(boardx + 46, boardy + 345, boardx + 46 + 176, boardy + 345 + 48)
+				if input.IsButtonReleased(1) then
+					if levelmod == 1 then
+						levelmod = 5
+					elseif levelmod == 5 then
+						levelmod = 10
+					elseif levelmod == 10 then
+						levelmod = 15
+					elseif levelmod == 15 then
+						levelmod = 1
+					end
+				end
+			end
+			draw.Text(boardx + 134 - (draw.GetTextSize("LEVEL: " .. levelmod) / 2), boardy + 355, "LEVEL: " .. levelmod)
+			if inRect(mx,my,boardx + 53, boardy + 565, boardx + 53 + 76, boardy + 565 + 56) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(settingsclicktexture)
+				else
+					draw.SetTexture(settingshovertexture)
+				end
+				draw.FilledRect(boardx + 53, boardy + 565, boardx + 53 + 76, boardy + 565 + 56)
+				if input.IsButtonReleased(1) then
+					if not settingstoggle then
+						settingswindow:SetActive(1)
+						settingstoggle = true
+					else
+						settingswindow:SetActive(0)
+						settingstoggle = false
+					end
+				end
+			end
+			if inRect(mx,my,boardx + 138, boardy + 565, boardx + 138 + 76, boardy + 565 + 56) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(helpclicktexture)
+				else
+					draw.SetTexture(helphovertexture)
+				end
+				draw.FilledRect(boardx + 138, boardy + 565, boardx + 138 + 76, boardy + 565 + 56)
+				if input.IsButtonReleased(1) then
+					helpscreen = 1
+					misclick = true
 				end
 			end
 		end
-		if inRect(mx,my,boardx + 138, boardy + 565, boardx + 138 + 76, boardy + 565 + 56) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(helpclicktexture)
-			else
-				draw.SetTexture(helphovertexture)
-			end
-			draw.FilledRect(boardx + 138, boardy + 565, boardx + 138 + 76, boardy + 565 + 56)
-			if input.IsButtonReleased(1) then
-				helpscreen = 1
-				misclick = true
-			end
-		end
-	end
-	
-	--draw the background image
-	draw.SetTexture(backgroundtexture)
-	draw.Color(255,255,255,255)
-	draw.FilledRect(boardx - 272, boardy + 63, boardx + 541, boardy + 674)
-	draw.SetTexture(defaulttexture)
-	draw.SetFont(smallfont)
-	draw.Color(0,0,0,50)
-	draw.Text(boardx - 259, boardy + 639, "Made by:")
-	draw.Text(boardx - 260, boardy + 650, "Cheeseot")
-	
-	--game over screen
-	if lost then
+		
+		--draw the background image
+		draw.SetTexture(backgroundtexture)
 		draw.Color(255,255,255,255)
-		draw.SetTexture(endscreentexture)
-		draw.FilledRect(boardx - 40, boardy + 193, boardx + 310, boardy + 543)
-		draw.SetFont(font)
-		for i, score in ipairs(highscores) do
-			draw.Text(boardx + 135 - draw.GetTextSize(highscores[i]) / 2, boardy + 281 + i * 24, highscores[i])
-		end
-		if inRect(mx,my,boardx + 139, boardy + 448, boardx + 138 + 77, boardy + 447 + 57) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(resetclicktexture)
+		draw.FilledRect(boardx - 272, boardy + 63, boardx + 541, boardy + 674)
+		draw.SetTexture(defaulttexture)
+		draw.SetFont(smallfont)
+		draw.Color(0,0,0,50)
+		draw.Text(boardx - 259, boardy + 639, "Made by:")
+		draw.Text(boardx - 260, boardy + 650, "Cheeseot")
+		
+			if inRect(mx, my, boardx + 501 + 3, boardy + 69 + 5, boardx + 501 + 3 + 20,boardy + 69 + 5 + 20) then
+				if input.IsButtonDown(1) then
+					draw.Color(0,0,0,150)
+				else
+					draw.Color(0,0,0,75)
+				end
+				if input.IsButtonReleased(1) then
+					gameopened:SetValue(0)
+				end
 			else
-				draw.SetTexture(resethovertexture)
+				draw.Color(0,0,0,25)
 			end
-			if input.IsButtonReleased(1) then
-				reset()
+			draw.SetFont(icons)
+			draw.TextShadow(boardx + 501, boardy + 69 , "r")
+		
+		--game over screen
+		if lost then
+			draw.Color(255,255,255,255)
+			draw.SetTexture(endscreentexture)
+			draw.FilledRect(boardx - 40, boardy + 193, boardx + 310, boardy + 543)
+			draw.SetFont(font)
+			for i, score in ipairs(highscores) do
+				draw.Text(boardx + 135 - draw.GetTextSize(highscores[i]) / 2, boardy + 281 + i * 24, highscores[i])
 			end
-			draw.FilledRect(boardx + 138, boardy + 447, boardx + 138 + 78, boardy + 447 + 58)
-		end
-		if inRect(mx,my,boardx + 54, boardy + 448, boardx + 53 + 77, boardy + 447 + 57) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(homeclicktexture)
-			else
-				draw.SetTexture(homehovertexture)
+			if inRect(mx,my,boardx + 139, boardy + 448, boardx + 138 + 77, boardy + 447 + 57) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(resetclicktexture)
+				else
+					draw.SetTexture(resethovertexture)
+				end
+				if input.IsButtonReleased(1) then
+					reset()
+				end
+				draw.FilledRect(boardx + 138, boardy + 447, boardx + 138 + 78, boardy + 447 + 58)
 			end
-			if input.IsButtonReleased(1) then
+			if inRect(mx,my,boardx + 54, boardy + 448, boardx + 53 + 77, boardy + 447 + 57) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(homeclicktexture)
+				else
+					draw.SetTexture(homehovertexture)
+				end
+				if input.IsButtonReleased(1) then
+					reset()
+					homescreen = true
+				end
+				draw.FilledRect(boardx + 53, boardy + 447, boardx + 53 + 78, boardy + 447 + 58)
+			end
+			if input.IsButtonPressed(27) and not et then
 				reset()
 				homescreen = true
+				et = true
 			end
-			draw.FilledRect(boardx + 53, boardy + 447, boardx + 53 + 78, boardy + 447 + 58)
 		end
-		if input.IsButtonPressed(27) and not et then
-			reset()
-			homescreen = true
-			et = true
-		end
-	end
-	
-	--pause button
-	if not lost and not homescreen and helpscreen == 0 then
-		draw.Color(255,255,255,255)
-		if inRect(mx,my,boardx + 446, boardy + 581, boardx + 520, boardy + 655) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(pauseclicktexture)
+		
+		--pause button
+		if not lost and not homescreen and helpscreen == 0 then
+			draw.Color(255,255,255,255)
+			if inRect(mx,my,boardx + 446, boardy + 581, boardx + 520, boardy + 655) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(pauseclicktexture)
+				else
+					draw.SetTexture(pausehovertexture)
+				end
+				if input.IsButtonReleased(1) then
+					if paused then
+						paused = false
+					else 
+						paused = true
+					end
+				end
 			else
-				draw.SetTexture(pausehovertexture)
+				draw.SetTexture(pausetexture)
 			end
-			if input.IsButtonReleased(1) then
-				if paused then
+			draw.FilledRect(boardx + 446, boardy + 581, boardx + 520, boardy + 655)
+		end
+		
+		--pause menu
+		if paused and helpscreen == 0 then
+			draw.Color(255,255,255,255)
+			draw.SetTexture(pausemenutexture)
+			draw.FilledRect(boardx - 6, boardy + 178, boardx - 6 + 281, boardy + 178 + 382)
+			if inRect(mx,my,boardx + 46, boardy + 284, boardx + 46 + 176, boardy + 284 + 48) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(resumeclicktexture)
+				else
+					draw.SetTexture(resumehovertexture)
+				end
+				if input.IsButtonReleased(1) then
 					paused = false
-				else 
-					paused = true
 				end
+				draw.FilledRect(boardx + 46, boardy + 284, boardx + 46 + 176, boardy + 284 + 48)
 			end
-		else
-			draw.SetTexture(pausetexture)
-		end
-		draw.FilledRect(boardx + 446, boardy + 581, boardx + 520, boardy + 655)
-	end
-	
-	--pause menu
-	if paused and helpscreen == 0 then
-		draw.Color(255,255,255,255)
-		draw.SetTexture(pausemenutexture)
-		draw.FilledRect(boardx - 6, boardy + 178, boardx - 6 + 281, boardy + 178 + 382)
-		if inRect(mx,my,boardx + 46, boardy + 284, boardx + 46 + 176, boardy + 284 + 48) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(resumeclicktexture)
-			else
-				draw.SetTexture(resumehovertexture)
-			end
-			if input.IsButtonReleased(1) then
-				paused = false
-			end
-			draw.FilledRect(boardx + 46, boardy + 284, boardx + 46 + 176, boardy + 284 + 48)
-		end
-		if inRect(mx,my,boardx + 46, boardy + 341, boardx + 46 + 176, boardy + 341 + 48) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(optionsclicktexture)
-			else
-				draw.SetTexture(optionshovertexture)
-			end
-			if input.IsButtonReleased(1) then
-				if not settingstoggle then
-					settingswindow:SetActive(1)
-					settingstoggle = true
-				else
-					settingswindow:SetActive(0)
-					settingstoggle = false
-				end
-			end
-			draw.FilledRect(boardx + 46, boardy + 341, boardx + 46 + 176, boardy + 341 + 48)
-		end
-		if inRect(mx,my,boardx + 46, boardy + 398, boardx + 46 + 176, boardy + 398 + 48) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(howtoplayclicktexture)
-			else
-				draw.SetTexture(howtoplayhovertexture)
-			end
-			if input.IsButtonReleased(1) then
-				helpscreen = 1
-			end
-			draw.FilledRect(boardx + 46, boardy + 398, boardx + 46 + 176, boardy + 398 + 48)
-		end
-		if inRect(mx,my,boardx + 46, boardy + 455, boardx + 46 + 176, boardy + 455 + 48) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(quitclicktexture)
-			else
-				draw.SetTexture(quithovertexture)
-			end
-			if input.IsButtonReleased(1) then
-				reset()
-				homescreen = true
-				paused = false
-			end
-			draw.FilledRect(boardx + 46, boardy + 455, boardx + 46 + 176, boardy + 455 + 48)
-		end
-	end
-	
-	--help screen
-	if helpscreen > 0 then
-		draw.Color(255,255,255,255)
-		if helpscreen == 1 then
-			draw.SetTexture(help1texture)
-			draw.FilledRect(boardx - 255, boardy + 70, boardx - 255 + 780, boardy + 70 + 600)
-			if inRect(mx,my,boardx + 201, boardy + 581, boardx + 201 + 56, boardy + 581 + 48) then
+			if inRect(mx,my,boardx + 46, boardy + 341, boardx + 46 + 176, boardy + 341 + 48) then
 				if input.IsButtonDown(1) then
-					draw.SetTexture(rightclicktexture)
+					draw.SetTexture(optionsclicktexture)
 				else
-					draw.SetTexture(righthovertexture)
+					draw.SetTexture(optionshovertexture)
 				end
-				draw.FilledRect(boardx + 202, boardy + 581, boardx + 202 + 56, boardy + 581 + 48)
-				if input.IsButtonReleased(1) and not misclick then
-					helpscreen = 2
+				if input.IsButtonReleased(1) then
+					if not settingstoggle then
+						settingswindow:SetActive(1)
+						settingstoggle = true
+					else
+						settingswindow:SetActive(0)
+						settingstoggle = false
+					end
 				end
+				draw.FilledRect(boardx + 46, boardy + 341, boardx + 46 + 176, boardy + 341 + 48)
 			end
-		elseif helpscreen == 2 then
-			draw.SetTexture(help2texture)
-			draw.FilledRect(boardx - 255, boardy + 70, boardx - 255 + 780, boardy + 70 + 600)
-			if inRect(mx,my,boardx + 12, boardy + 581, boardx + 12 + 56, boardy + 581 + 48) then
+			if inRect(mx,my,boardx + 46, boardy + 398, boardx + 46 + 176, boardy + 398 + 48) then
 				if input.IsButtonDown(1) then
-					draw.SetTexture(leftclicktexture)
+					draw.SetTexture(howtoplayclicktexture)
 				else
-					draw.SetTexture(lefthovertexture)
+					draw.SetTexture(howtoplayhovertexture)
 				end
-				draw.FilledRect(boardx + 12, boardy + 581, boardx + 12 + 56, boardy + 581 + 48)
 				if input.IsButtonReleased(1) then
 					helpscreen = 1
 				end
+				draw.FilledRect(boardx + 46, boardy + 398, boardx + 46 + 176, boardy + 398 + 48)
+			end
+			if inRect(mx,my,boardx + 46, boardy + 455, boardx + 46 + 176, boardy + 455 + 48) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(quitclicktexture)
+				else
+					draw.SetTexture(quithovertexture)
+				end
+				if input.IsButtonReleased(1) then
+					reset()
+					homescreen = true
+					paused = false
+				end
+				draw.FilledRect(boardx + 46, boardy + 455, boardx + 46 + 176, boardy + 455 + 48)
 			end
 		end
-		if inRect(mx,my,boardx + 87, boardy + 581, boardx + 87 + 96, boardy + 581 + 48) then
-			if input.IsButtonDown(1) then
-				draw.SetTexture(doneclicktexture)
-			else
-				draw.SetTexture(donehovertexture)
+		
+		--help screen
+		if helpscreen > 0 then
+			draw.Color(255,255,255,255)
+			if helpscreen == 1 then
+				draw.SetTexture(help1texture)
+				draw.FilledRect(boardx - 255, boardy + 70, boardx - 255 + 780, boardy + 70 + 600)
+				if inRect(mx,my,boardx + 201, boardy + 581, boardx + 201 + 56, boardy + 581 + 48) then
+					if input.IsButtonDown(1) then
+						draw.SetTexture(rightclicktexture)
+					else
+						draw.SetTexture(righthovertexture)
+					end
+					draw.FilledRect(boardx + 202, boardy + 581, boardx + 202 + 56, boardy + 581 + 48)
+					if input.IsButtonReleased(1) and not misclick then
+						helpscreen = 2
+					end
+				end
+			elseif helpscreen == 2 then
+				draw.SetTexture(help2texture)
+				draw.FilledRect(boardx - 255, boardy + 70, boardx - 255 + 780, boardy + 70 + 600)
+				if inRect(mx,my,boardx + 12, boardy + 581, boardx + 12 + 56, boardy + 581 + 48) then
+					if input.IsButtonDown(1) then
+						draw.SetTexture(leftclicktexture)
+					else
+						draw.SetTexture(lefthovertexture)
+					end
+					draw.FilledRect(boardx + 12, boardy + 581, boardx + 12 + 56, boardy + 581 + 48)
+					if input.IsButtonReleased(1) then
+						helpscreen = 1
+					end
+				end
 			end
-			if input.IsButtonReleased(1) and not misclick then
+			if inRect(mx,my,boardx + 87, boardy + 581, boardx + 87 + 96, boardy + 581 + 48) then
+				if input.IsButtonDown(1) then
+					draw.SetTexture(doneclicktexture)
+				else
+					draw.SetTexture(donehovertexture)
+				end
+				if input.IsButtonReleased(1) and not misclick then
+					helpscreen = 0
+				end
+				draw.FilledRect(boardx + 87, boardy + 581, boardx + 87 + 96, boardy + 581 + 48)
+			end
+			if input.IsButtonPressed(27) and not et then
 				helpscreen = 0
+				et = true
 			end
-			draw.FilledRect(boardx + 87, boardy + 581, boardx + 87 + 96, boardy + 581 + 48)
 		end
-		if input.IsButtonPressed(27) and not et then
-			helpscreen = 0
-			et = true
-		end
-	end
-	draw.SetTexture(defaulttexture)
-	
-	--next pieces on the right
-	if nextpieces ~= nil and not paused and not homescreen then
-		for i, piece in ipairs(nextpieces) do
-			draw.Color(piece.color[1],piece.color[2],piece.color[3],255)
-			local offset = 0
-			local yoffset = 0
-			if piece.name == "I" or piece.name == "O" then
-				offset = 12
-				if piece.name == "I" then
-					yoffset = -12
+		draw.SetTexture(defaulttexture)
+		
+		--next pieces on the right
+		if nextpieces ~= nil and not paused and not homescreen then
+			for i, piece in ipairs(nextpieces) do
+				draw.Color(piece.color[1],piece.color[2],piece.color[3],255)
+				local offset = 0
+				local yoffset = 0
+				if piece.name == "I" or piece.name == "O" then
+					offset = 12
+					if piece.name == "I" then
+						yoffset = -12
+					end
+				end
+				for ii, block in ipairs(piece.blocks.up) do
+					local x = 11
+					local y = 3 + ((i - 1) * 3)
+					draw.RoundedRectFill(boardx + ((block[2] + x) + 5) - offset + ((block[2] + x) * 25) + 61,
+									boardy + ((block[1] + y) + 5) - yoffset + ((block[1] + y) * 25) + 61,
+									boardx + ((block[2] + x) + 5) - offset + ((block[2] + x) * 25) + 25 + 61,
+									boardy + ((block[1] + y) + 5) - yoffset + ((block[1] + y) * 25) + 25 + 61)
 				end
 			end
-			for ii, block in ipairs(piece.blocks.up) do
-				local x = 11
-				local y = 3 + ((i - 1) * 3)
-				draw.RoundedRectFill(boardx + ((block[2] + x) + 5) - offset + ((block[2] + x) * 25) + 61,
-								boardy + ((block[1] + y) + 5) - yoffset + ((block[1] + y) * 25) + 61,
-								boardx + ((block[2] + x) + 5) - offset + ((block[2] + x) * 25) + 25 + 61,
-								boardy + ((block[1] + y) + 5) - yoffset + ((block[1] + y) * 25) + 25 + 61)
-			end
 		end
-	end
-	
-	--saved piece on the left
-	if savedpiece ~= nil and not paused and not homescreen then
-		draw.Color(savedpiece.color[1],savedpiece.color[2],savedpiece.color[3],255)
-		for i, block in ipairs(savedpiece.blocks.up) do
-			local offset = 0
-			local yoffset = 0
-			if savedpiece.name == "I" or savedpiece.name == "O" then
-				offset = 12
-				if savedpiece.name == "I" then
-					yoffset = -12
+		
+		--saved piece on the left
+		if savedpiece ~= nil and not paused and not homescreen then
+			draw.Color(savedpiece.color[1],savedpiece.color[2],savedpiece.color[3],255)
+			for i, block in ipairs(savedpiece.blocks.up) do
+				local offset = 0
+				local yoffset = 0
+				if savedpiece.name == "I" or savedpiece.name == "O" then
+					offset = 12
+					if savedpiece.name == "I" then
+						yoffset = -12
+					end
 				end
+				local x = -4
+				local y = 3
+					draw.RoundedRectFill(boardx + ((block[2] + x) + 5) - offset + ((block[2] + x) * 25) - 62,
+									boardy + ((block[1] + y) + 5) - yoffset + ((block[1] + y) * 25) + 71,
+									boardx + ((block[2] + x) + 5) - offset + ((block[2] + x) * 25) + 25 - 62,
+									boardy + ((block[1] + y) + 5) - yoffset + ((block[1] + y) * 25) + 25 + 71)
 			end
-			local x = -4
-			local y = 3
-				draw.RoundedRectFill(boardx + ((block[2] + x) + 5) - offset + ((block[2] + x) * 25) - 62,
-								boardy + ((block[1] + y) + 5) - yoffset + ((block[1] + y) * 25) + 71,
-								boardx + ((block[2] + x) + 5) - offset + ((block[2] + x) * 25) + 25 - 62,
-								boardy + ((block[1] + y) + 5) - yoffset + ((block[1] + y) * 25) + 25 + 71)
 		end
-	end
-	
-	--score and stuff
-	if not homescreen and helpscreen == 0 then
-		draw.SetFont(font)
-		draw.Color(255,255,255,255)
-		draw.Text(boardx - 121 - draw.GetTextSize(score) / 2, boardy + 448, score)
-		draw.Text(boardx - 121 - draw.GetTextSize(level) / 2, boardy + 508, level)
-		draw.Text(boardx - 121 - draw.GetTextSize(rows) / 2, boardy + 568, rows)
-	end
-	
-	if input.IsButtonReleased(27) then
-		et = false
+		
+		--score and stuff
+		if not homescreen and helpscreen == 0 then
+			draw.SetFont(font)
+			draw.Color(255,255,255,255)
+			draw.Text(boardx - 121 - draw.GetTextSize(score) / 2, boardy + 448, score)
+			draw.Text(boardx - 121 - draw.GetTextSize(level) / 2, boardy + 508, level)
+			draw.Text(boardx - 121 - draw.GetTextSize(rows) / 2, boardy + 568, rows)
+		end
+		
+		if input.IsButtonReleased(27) then
+			et = false
+		end
 	end
 end
 
