@@ -6,21 +6,21 @@ local oldx, oldy = menuref:GetValue()
 local movex, movey = 0,0
 gui.Text(groupref, "  ")
 local boxthing = gui.Groupbox(groupref, "Background by Cheeseot")
-local dotsizeslider = gui.Slider( boxthing, sizeslider, "Size", 2, 0, 5 )
+local dotsizeslider = gui.Slider( boxthing, "sizeslider", "Size", 2, 0, 5 )
 local dotsize = 2
-local dotamountslider = gui.Slider( boxthing, amountslider, "Amount", 250, 0, 500 )
+local dotamountslider = gui.Slider( boxthing, "amountslider", "Amount", 250, 0, 500 )
 local amount = 250
-local dotspeedslider = gui.Slider( boxthing, speedslider, "Max. Speed", 50, 0, 500 )
+local dotspeedslider = gui.Slider( boxthing, "speedslider", "Max. Speed", 50, 0, 500 )
 local speed, oldspeed = 5, 5
-local minspeedslider = gui.Slider( boxthing, minspeedslider, "Min. Speed", 10, 0, 500 )
+local minspeedslider = gui.Slider( boxthing, "minspeedslider", "Min. Speed", 10, 0, 500 )
 local minspeed, oldminspeed = 1, 1
-local dotcolor = gui.ColorEntry( dotcolor, "Background Dot Color", 255, 255, 255, 130 )
-local linecolor = gui.ColorEntry( linecolor, "Background Line Color", 255, 255, 255, 65)
-local fadecolor = gui.ColorEntry( fadecolor, "Background Fade Color", 0, 0, 0, 125)
+local dotcolor = gui.ColorEntry( "dotcolor", "Background Dot Color", 255, 255, 255, 130 )
+local linecolor = gui.ColorEntry( "linecolor", "Background Line Color", 255, 255, 255, 65)
+local fadecolor = gui.ColorEntry( "fadecolor", "Background Fade Color", 0, 0, 0, 125)
 local w,h = 1920,1080
 local menux, menuy, menusizex, menusizey, scale = 0, 0, 800, 600, 1
-local solidmenu = gui.Checkbox(boxthing, solidmenu, "Make Menu Solid", 1)
-local constantspeed = gui.Checkbox(boxthing, constantspeed, "Keep Speed Independent of FPS", 1)
+local solidmenu = gui.Checkbox(boxthing, "solidmenu", "Make Menu Solid", 1)
+local constantspeed = gui.Checkbox(boxthing, "constantspeed", "Keep Speed Independent of FPS", 1)
 local framerate = 0.0
 
 local function getfps()
@@ -134,8 +134,6 @@ menux,menuy = menuref:GetValue()
 	end
 
 	while #dots < amount do
-	
-		
 	
 		local posx = math.random(w)
 		local posy = math.random(h)
