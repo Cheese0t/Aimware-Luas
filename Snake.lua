@@ -16,8 +16,8 @@ local font3 = draw.CreateFont("Arial", 20, 20)
 local font4 = draw.CreateFont("Impact", 18)
 local icons = draw.CreateFont("Webdings", 18, 18)
 local icons2 = draw.CreateFont("Webdings", 32, 32)
-local ref = gui.Reference("Misc", "GENERAL", "Main")
-local shoulddraw = gui.Checkbox(ref, shoulddraw, "Snake", 1)
+local ref = gui.Reference("Misc", "GENERAL", "Extra")
+local shoulddraw = gui.Checkbox(ref, "shoulddraw", "Snake", 1)
 local tempdif, tempw, temph, dif = 2, 30, 30
 local sounds = true
 
@@ -434,9 +434,9 @@ local function drawboard()
 	draw.FilledRect(boardx - 1, boardy - 26, (boardx + 9 + boardw * 11) + 1,boardy - 1)
 	draw.Color(255,255,255,255)
 	draw.SetFont(font3)
-	draw.TextShadow((boardx - 1) + (((boardx + 9 + boardw * 11) + 1) - (boardx - 1)) / 2 - draw.GetTextSize("Snake") / 2, boardy - 23, "Snake")
-	draw.SetFont(Font2)
-	draw.TextShadow(boardx + 4, boardy - 20, "Score: " .. score)
+	draw.TextShadow((boardx - 1) + (((boardx + 9 + boardw * 11) + 1) - (boardx - 1)) / 2 - draw.GetTextSize("Snake") / 2, boardy - 20, "Snake")
+	draw.SetFont(font2)
+	draw.TextShadow(boardx + 4, boardy - 18, "Score: " .. score)
 	draw.SetFont(icons)
 	
 	if inRect(mousex, mousey,(boardx + 9 + boardw * 11) + 1 - 20, boardy - 26 + 5, (boardx + 9 + boardw * 11) + 1 - 5, boardy - 1 - 5) then
@@ -457,7 +457,7 @@ local function drawboard()
 	draw.Color(0, 0, 0, 125)
 	draw.OutlinedRect((boardx + 9 + boardw * 11) + 1 - 20, boardy - 26 + 5, (boardx + 9 + boardw * 11) + 1 - 5, boardy - 1 - 5)
 	draw.Color(0, 0, 0, 255)
-	draw.Text((boardx + 9 + boardw * 11) + 1 - 19, boardy - 26 + 3, "r")
+	draw.Text((boardx + 9 + boardw * 11) + 1 - 19, boardy - 26 + 5 , "r")
 	
 	if drawsettings and not inRect(mousex, mousey,(boardx + 9 + boardw * 11) + 1 - 40, boardy - 26 + 5, (boardx + 9 + boardw * 11) + 1 - 25, boardy - 1 - 5)then
 		draw.Color(150, 150, 150, 200)
@@ -487,7 +487,7 @@ local function drawboard()
 	draw.Color(0,0,0,125)
 	draw.OutlinedRect((boardx + 9 + boardw * 11) + 1 - 40, boardy - 26 + 5, (boardx + 9 + boardw * 11) + 1 - 25, boardy - 1 - 5)
 	draw.Color(0, 0, 0, 255)
-	draw.Text((boardx + 9 + boardw * 11) + 1 - 39, boardy - 26 + 3, "@")
+	draw.Text((boardx + 9 + boardw * 11) + 1 - 39, boardy - 26 + 5 , "@")
 	
 	if inRect(mousex, mousey,(boardx + 9 + boardw * 11) + 1 - 60, boardy - 26 + 5, (boardx + 9 + boardw * 11) + 1 - 45, boardy - 1 - 5) then
 		if left_mouse_down then
@@ -509,9 +509,9 @@ local function drawboard()
 	draw.Color(0, 0, 0, 125)
 	draw.OutlinedRect((boardx + 9 + boardw * 11) + 1 - 60, boardy - 26 + 5, (boardx + 9 + boardw * 11) + 1 - 45, boardy - 1 - 5)
 	draw.Color(0, 0, 0, 255)
-	draw.Text((boardx + 9 + boardw * 11) + 1 - 56, boardy - 26 + 3, "X")
+	draw.Text((boardx + 9 + boardw * 11) + 1 - 56, boardy - 26 + 5 , "X")
 	if not sounds then
-		draw.Text((boardx + 9 + boardw * 11) + 1 - 59, boardy - 26 + 3, "x")
+		draw.Text((boardx + 9 + boardw * 11) + 1 - 59, boardy - 26 + 5, "x")
 	end
 	
 	draw.Color(20, 20, 20, 255)
@@ -523,9 +523,9 @@ local function drawboard()
 	draw.FilledRect(boardx - 1, (boardy + 9 + boardh * 11) + 1,(boardx + 9 + boardw * 11) + 1, (boardy + 9 + boardh * 11) + 16)
 	draw.SetFont(font2)
 	draw.Color(255, 255, 255, 150)
-	draw.TextShadow(boardx + 4, (boardy + 9 + boardh * 11) + 1, "Made by: Cheeseot")
+	draw.TextShadow(boardx + 4, (boardy + 9 + boardh * 11) + 4, "Made by: Cheeseot")
 	draw.Color(255, 255, 255, 255)
-	draw.TextShadow((boardx + 9 + boardw * 11) + 1 - 5 - draw.GetTextSize("Level: " .. speedadjust), (boardy + 9 + boardh * 11) + 1, "Level: " .. speedadjust)
+	draw.TextShadow((boardx + 9 + boardw * 11) + 1 - 5 - draw.GetTextSize("Level: " .. speedadjust), (boardy + 9 + boardh * 11) + 4, "Level: " .. speedadjust)
 	
 	if drawsettings then
 		draw.Color(20, 20, 20, 255)
@@ -535,7 +535,7 @@ local function drawboard()
 		draw.SetFont(font3)
 		draw.Color(255, 255, 255, 255)
 		local settingsmiddle = (boardx + 10 + boardw * 11 + 40) + ((boardx + 10 + boardw * 11 + 200 - 40) - (boardx + 10 + boardw * 11 + 40)) / 2
-		draw.Text(settingsmiddle - draw.GetTextSize("Difficulty") / 2, boardy + 15, "Difficulty")
+		draw.Text(settingsmiddle - draw.GetTextSize("Difficulty") / 2, boardy + 18, "Difficulty")
 		
 		if tempdif <= 1 then
 			draw.Color(60, 60, 60, 255)
@@ -587,16 +587,16 @@ local function drawboard()
 		
 		draw.SetFont(font1)
 		draw.Color(255, 255, 255, 255) 
-		draw.TextShadow(settingsmiddle - draw.GetTextSize(dif) / 2, boardy + 44, dif)
+		draw.TextShadow(settingsmiddle - draw.GetTextSize(dif) / 2, boardy + 47, dif)
 		draw.SetFont(icons2)
 		draw.Color(25, 25, 25, 255)
-		draw.TextShadow(boardx + 10 + boardw * 11 + 15, boardy + 41, "3")
-		draw.TextShadow(boardx + 10 + boardw * 11 + 200 - 43, boardy + 41, "4")
+		draw.TextShadow(boardx + 10 + boardw * 11 + 15, boardy + 43, "3")
+		draw.TextShadow(boardx + 10 + boardw * 11 + 200 - 43, boardy + 43, "4")
 		
 		draw.SetFont(font3)
 		draw.Color(255, 255, 255, 255)
-		draw.Text((boardx + 10 + boardw * 11 + 15) + ((settingsmiddle - 7.5) - (boardx + 10 + boardw * 11 + 15)) / 2 - draw.GetTextSize("Width") / 2, boardy + 90, "Width")
-		draw.Text((boardx + 10 + boardw * 11 + 200 - 40) + ((boardx + 10 + boardw * 11 + 200 - 15) - (boardx + 10 + boardw * 11 + 200 - 40)) / 2 - draw.GetTextSize("Height"), boardy + 90, "Height")
+		draw.Text((boardx + 10 + boardw * 11 + 15) + ((settingsmiddle - 7.5) - (boardx + 10 + boardw * 11 + 15)) / 2 - draw.GetTextSize("Width") / 2, boardy + 93, "Width")
+		draw.Text((boardx + 10 + boardw * 11 + 200 - 40) + ((boardx + 10 + boardw * 11 + 200 - 15) - (boardx + 10 + boardw * 11 + 200 - 40)) / 2 - draw.GetTextSize("Height"), boardy + 93, "Height")
 		if tempw <= 15 then
 			draw.Color(60, 60, 60, 255)
 		elseif inRect(mousex, mousey, boardx + 10 + boardw * 11 + 15, boardy + 115, boardx + 10 + boardw * 11 + 40, boardy + 150) then
@@ -638,11 +638,11 @@ local function drawboard()
 		draw.FilledRect(boardx + 10 + boardw * 11 + 40, boardy + 115, settingsmiddle - 7.5-25, boardy + 150)
 		draw.SetFont(font1)
 		draw.Color(255, 255, 255, 255)
-		draw.TextShadow((boardx + 10 + boardw * 11 + 40) + ((settingsmiddle - 7.5-25) - (boardx + 10 + boardw * 11 + 40)) / 2 - draw.GetTextSize(tempw) / 2, boardy + 119, tempw)
+		draw.TextShadow((boardx + 10 + boardw * 11 + 40) + ((settingsmiddle - 7.5-25) - (boardx + 10 + boardw * 11 + 40)) / 2 - draw.GetTextSize(tempw) / 2, boardy + 122, tempw)
 		draw.SetFont(icons2)
 		draw.Color(25, 25, 25, 255)
-		draw.TextShadow(boardx + 10 + boardw * 11 + 15, boardy + 116, "3")
-		draw.TextShadow(settingsmiddle - 7.5-28, boardy + 116, "4")
+		draw.TextShadow(boardx + 10 + boardw * 11 + 15, boardy + 118, "3")
+		draw.TextShadow(settingsmiddle - 7.5-28, boardy + 118, "4")
 		
 		if temph >= 75 then
 			draw.Color(60, 60, 60, 255)
@@ -685,11 +685,11 @@ local function drawboard()
 		draw.FilledRect(settingsmiddle + 7.5+25, boardy + 115, boardx + 10 + boardw * 11 + 200 - 40, boardy + 150)
 		draw.SetFont(font1)
 		draw.Color(255, 255, 255, 255)
-		draw.TextShadow((settingsmiddle + 7.5+25) + ((boardx + 10 + boardw * 11 + 200 - 40) - (settingsmiddle + 7.5+25)) / 2 - draw.GetTextSize(temph) / 2, boardy + 119 , temph)
+		draw.TextShadow((settingsmiddle + 7.5+25) + ((boardx + 10 + boardw * 11 + 200 - 40) - (settingsmiddle + 7.5+25)) / 2 - draw.GetTextSize(temph) / 2, boardy + 122 , temph)
 		draw.SetFont(icons2)
 		draw.Color(25, 25, 25, 255)
-		draw.TextShadow(settingsmiddle + 7.5, boardy + 116, "3")
-		draw.TextShadow(boardx + 10 + boardw * 11 + 200 - 43, boardy + 116, "4")
+		draw.TextShadow(settingsmiddle + 7.5, boardy + 118, "3")
+		draw.TextShadow(boardx + 10 + boardw * 11 + 200 - 43, boardy + 118, "4")
 		
 		if tempdif == difficulty and tempw == boardw and temph == boardh then
 			draw.Color(60, 60, 60, 255)
@@ -714,7 +714,7 @@ local function drawboard()
 		draw.FilledRect(boardx + 10 + boardw * 11 + 30, boardy + 165, boardx + 10 + boardw * 11 + 200 - 30, boardy + 200)
 		draw.Color(255, 255, 255, 255)
 		draw.SetFont(font1)
-		draw.TextShadow((boardx + 10 + boardw * 11 + 30) + ((boardx + 10 + boardw * 11 + 200 - 30) - (boardx + 10 + boardw * 11 + 30)) / 2 - draw.GetTextSize("Apply") / 2, boardy + 169, "Apply")
+		draw.TextShadow((boardx + 10 + boardw * 11 + 30) + ((boardx + 10 + boardw * 11 + 200 - 30) - (boardx + 10 + boardw * 11 + 30)) / 2 - draw.GetTextSize("Apply") / 2, boardy + 172, "Apply")
 	end	
 		
 		for x, line in ipairs(board) do
