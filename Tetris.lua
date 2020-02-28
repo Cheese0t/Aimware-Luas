@@ -145,7 +145,7 @@ local function loadhelp()
 end
 
 --resetting textures
-local defaulttexture = draw.CreateTexture()
+local defaulttexture = nil 
 
 --varibles
 local board, currpos, ghostpos, nextpieces, highscores, animrows = {}, {}, {}, {}, {}, {}
@@ -158,13 +158,13 @@ local locking, placed, tspin, rotated, saved, lost, paused, homescreen = false, 
 local ml, mr, rl, rr, pt, et = false, false, false, false, false, false
 local is_dragging = false
 local dragging_offset_x, dragging_offset_y = 0, 0
+
 local dirs = {"up","right","down","left"}
 local bag = {"I","O","T","S","Z","J","L"}
 local smallfont = draw.CreateFont("Bahnschrift", 15)
 local font = draw.CreateFont("Bahnschrift Bold", 25)
 local icons = draw.CreateFont("Webdings", 30)
-local ref = gui.Reference("Misc", "GENERAL", "Main")
-local gameopened = gui.Checkbox(ref, active, "Tetris", 1)
+local gameopened = gui.Checkbox(gui.Reference("MISC", "General", "Extra"), "active", "Tetris", 1)
 local secondframe = false
 
 local keys = {
@@ -178,8 +178,8 @@ local keys = {
 }
 
 local settingstoggle = false
-local settingswindow = gui.Window("settings", "Tetris Options", boardx - 200, boardy + 75, 175, 296)
-local settingsgroup = gui.Groupbox(settingswindow, "", 5, 5, 165, 256)
+local settingswindow = gui.Window("settings", "Tetris Options", boardx - 200, boardy + 75, 175, 561)
+local settingsgroup = gui.Groupbox(settingswindow, "Keybinds", 5, 5, 165, 521)
 local rightkeybox = gui.Keybox (settingsgroup, "rightkeybox", "Move Right", 39)
 local leftkeybox = gui.Keybox (settingsgroup, "leftkeybox", "Move Left", 37)
 local cwkeybox = gui.Keybox (settingsgroup, "cwkeybox", "Rotate Right", 38)
@@ -190,17 +190,17 @@ local holdkeybox = gui.Keybox (settingsgroup, "holdkeybox", "Hold", 67)
 local ghostbox = gui.Checkbox (settingsgroup, "ghostbox", "Show Ghost Piece", 1)
 local applybutton = gui.Button(settingsgroup, "Apply Settings", 
 	function() 
-		keys.moveright = gui.GetValue("rightkeybox")
-		keys.moveleft = gui.GetValue("leftkeybox")
-		keys.rotateright = gui.GetValue("cwkeybox")
-		keys.rotateleft = gui.GetValue("ccwkeybox")
-		keys.softdrop = gui.GetValue("softkeybox")
-		keys.harddrop = gui.GetValue("hardkeybox")
-		keys.hold = gui.GetValue("holdkeybox")
+		keys.moveright = gui.GetValue("settings.rightkeybox")
+		keys.moveleft = gui.GetValue("settings.leftkeybox")
+		keys.rotateright = gui.GetValue("settings.cwkeybox")
+		keys.rotateleft = gui.GetValue("settings.ccwkeybox")
+		keys.softdrop = gui.GetValue("settings.softkeybox")
+		keys.harddrop = gui.GetValue("settings.hardkeybox")
+		keys.hold = gui.GetValue("settings.holdkeybox")
 	end
 )
 
-settingswindow:SetActive(0)
+settingswindow:SetActive(false)
 
 ---------------------------------------------------------
 -- Everything made accoring to:
@@ -589,10 +589,10 @@ local count = {}
 				prevscore = 1
 			end
 		end
-		level = math.floor(rows / 10) + levelmod --every 10 rows increases level by 1
-		if level > 15 then level = 15 end --cap level at 15
-		steptime = (0.8-((level-1)*0.007))^(level-1) --tetris guidelines say it should be like this
-		steptime = math.floor(steptime*100000)/100000 --cap it to 5 digits
+		level = math.floor(rows / 10) + levelmod 		 --every 10 rows increases level by 1
+		if level > 15 then level = 15 end 				--cap level at 15
+		steptime = (0.8-((level-1)*0.007))^(level-1) 	 --tetris guidelines say it should be like this
+		steptime = math.floor(steptime*100000)/100000 	--cap it to 5 digits
 	elseif lost then
 		insertscore(score)
 	end
@@ -758,10 +758,10 @@ local tn = nil
 		if collision() then
 			for case = 1, 4 do
 				currpos.x = currpos.x + wallkicks[tn][rdir][rotation][case][1]
-				currpos.y = currpos.y + (wallkicks[tn][rdir][rotation][case][2] * -1) --multiplied by -1 because positive numbers meant up instead of
-					if not collision() then	--if we didn't hit anything				  --down on the SRS wiki and I'm not correcting the entire table
-						return true			--exit out of the loop and keep current position as the one we tested
-					else 					--else reset position and try the next case
+				currpos.y = currpos.y + (wallkicks[tn][rdir][rotation][case][2] * -1) 	--multiplied by -1 because positive numbers meant up instead of
+					if not collision() then				  							 --down on the SRS wiki and I'm not correcting the entire table
+						return true			
+					else 					
 						currpos.x = tempx
 						currpos.y = tempy
 					end
@@ -807,10 +807,10 @@ local function getghost()
 		-- if it didn't hit anything move 1 down
 		if not stop then 
 			ghostpos.y = ghostpos.y + 1
-			distance = distance + 1 --count how much we can move
+			distance = distance + 1
 			moved = true
-			goto loop -- try again with the new position
-		elseif moved then -- if we hit something then undo our last move and exit out of the loop
+			goto loop 
+		elseif moved then 
 			ghostpos.y = ghostpos.y - 1
 		end
 		distance = distance - 1
@@ -1180,7 +1180,7 @@ if gameopened:GetValue() then
 		end
 		
 		--ghost piece at bottom
-		if currpiece ~= nil and not paused and gui.GetValue("ghostbox") then
+		if currpiece ~= nil and not paused and gui.GetValue("settings.ghostbox") then
 			for i, block in ipairs(currpiece.blocks[dir]) do
 				if block[1] + ghostpos.y >= 4 then
 					draw.Color(currpiece.color[1],currpiece.color[2],currpiece.color[3],25)				
@@ -1223,7 +1223,7 @@ if gameopened:GetValue() then
 			draw.FilledRect(boardx - 1, boardy + 104, boardx + 269, boardy + 633)
 			draw.SetFont(font)
 			for i, score in ipairs(highscores) do
-				draw.Text(boardx + 135 - draw.GetTextSize(highscores[i]) / 2, boardy + 404 + i * 24, highscores[i])
+				draw.Text(boardx + 135 - draw.GetTextSize(highscores[i]) / 2, boardy + 409 + i * 24, highscores[i])
 			end
 			if inRect(mx,my,boardx + 36, boardy + 283, boardx + 36 + 196, boardy + 283 + 56) then
 				if input.IsButtonDown(1) then
@@ -1258,7 +1258,7 @@ if gameopened:GetValue() then
 					end
 				end
 			end
-			draw.Text(boardx + 134 - (draw.GetTextSize("LEVEL: " .. levelmod) / 2), boardy + 355, "LEVEL: " .. levelmod)
+			draw.Text(boardx + 134 - (draw.GetTextSize("LEVEL: " .. levelmod) / 2), boardy + 360, "LEVEL: " .. levelmod)
 			if inRect(mx,my,boardx + 53, boardy + 565, boardx + 53 + 76, boardy + 565 + 56) then
 				if input.IsButtonDown(1) then
 					draw.SetTexture(settingsclicktexture)
@@ -1268,10 +1268,10 @@ if gameopened:GetValue() then
 				draw.FilledRect(boardx + 53, boardy + 565, boardx + 53 + 76, boardy + 565 + 56)
 				if input.IsButtonReleased(1) then
 					if not settingstoggle then
-						settingswindow:SetActive(1)
+						settingswindow:SetActive(true)
 						settingstoggle = true
 					else
-						settingswindow:SetActive(0)
+						settingswindow:SetActive(false)
 						settingstoggle = false
 					end
 				end
@@ -1307,13 +1307,13 @@ if gameopened:GetValue() then
 					draw.Color(0,0,0,75)
 				end
 				if input.IsButtonReleased(1) then
-					gameopened:SetValue(0)
+					gameopened:SetValue(false)
 				end
 			else
 				draw.Color(0,0,0,25)
 			end
 			draw.SetFont(icons)
-			draw.TextShadow(boardx + 501, boardy + 69 , "r")
+			draw.TextShadow(boardx + 501, boardy + 72 , "r")
 		
 		--game over screen
 		if lost then
@@ -1325,7 +1325,7 @@ if gameopened:GetValue() then
 			draw.FilledRect(boardx - 40, boardy + 193, boardx + 310, boardy + 543)
 			draw.SetFont(font)
 			for i, score in ipairs(highscores) do
-				draw.Text(boardx + 135 - draw.GetTextSize(highscores[i]) / 2, boardy + 281 + i * 24, highscores[i])
+				draw.Text(boardx + 135 - draw.GetTextSize(highscores[i]) / 2, boardy + 286 + i * 24, highscores[i])
 			end
 			if inRect(mx,my,boardx + 139, boardy + 448, boardx + 138 + 77, boardy + 447 + 57) then
 				if input.IsButtonDown(1) then
@@ -1405,12 +1405,14 @@ if gameopened:GetValue() then
 					draw.SetTexture(optionshovertexture)
 				end
 				if input.IsButtonReleased(1) then
+					
 					if not settingstoggle then
-						settingswindow:SetActive(1)
+						settingswindow:SetActive(true)
 						settingstoggle = true
 					else
-						settingswindow:SetActive(0)
-						settingstoggle = false
+	
+						settingswindow:SetActive(false)
+						settingstoggle = false	
 					end
 				end
 				draw.FilledRect(boardx + 46, boardy + 341, boardx + 46 + 176, boardy + 341 + 48)
@@ -1542,9 +1544,9 @@ if gameopened:GetValue() then
 		if not homescreen and helpscreen == 0 then
 			draw.SetFont(font)
 			draw.Color(255,255,255,255)
-			draw.Text(boardx - 121 - draw.GetTextSize(score) / 2, boardy + 448, score)
-			draw.Text(boardx - 121 - draw.GetTextSize(level) / 2, boardy + 508, level)
-			draw.Text(boardx - 121 - draw.GetTextSize(rows) / 2, boardy + 568, rows)
+			draw.Text(boardx - 121 - draw.GetTextSize(score) / 2, boardy + 453, score)
+			draw.Text(boardx - 121 - draw.GetTextSize(level) / 2, boardy + 513, level)
+			draw.Text(boardx - 121 - draw.GetTextSize(rows) / 2, boardy + 573, rows)
 		end
 		
 		if input.IsButtonReleased(27) then
