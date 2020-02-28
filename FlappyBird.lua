@@ -330,7 +330,7 @@ local function dec(data)
     end))
 end
 
-local defaulttexture = draw.CreateTexture()
+local defaulttexture = nil
 
 local backgrounddat = dec(b64_background)
 local backgroundrgba, backgroundw, backgroundh = common.DecodePNG(backgrounddat)
@@ -384,8 +384,8 @@ local jumpcheck, lost, started, is_dragging = false, false, false, false
 local starttextpos = 300
 local birdstep, groundanim, score, newscore, starttime, highscore = 0, 0, 0, 0, 0, 0
 local dragging_offset_x, dragging_offset_x, prevmousex, prevmousey, mx, my = 0, 0, 0, 0, 0, 0
-local ref = gui.Reference("Misc", "GENERAL", "Main")
-local active = gui.Checkbox(ref, active, "FlappyBird", 1)
+
+local active = gui.Checkbox(gui.Reference("MISC", "General", "Extra"), "active", "FlappyBird", 1)
 local font1 = draw.CreateFont("Bahnschrift Bold", 35)
 local font2 = draw.CreateFont("Bahnschrift Bold", 25)
 local font3 = draw.CreateFont("Bahnschrift Bold", 45)
@@ -734,17 +734,17 @@ local function drawing()
 				draw.Color(0,0,0,75)
 			end
 			if input.IsButtonReleased(1) then
-				active:SetValue(0)
+				active:SetValue(false)
 			end
 		else
 			draw.Color(0,0,0,25)
 		end
 		draw.SetFont(icons)
-		draw.TextShadow(windowx + windowsizex + 38, windowy - 40 , "r")
+		draw.TextShadow(windowx + windowsizex + 38, windowy - 37 , "r")
 		draw.Color(255,255,255,255)
 		draw.SetTexture(groundtexture)
 		draw.FilledRect(windowx - 20 - groundanim ,windowy + windowsizey, windowx + 480 - groundanim ,windowy + windowsizey + 48)
-		draw.SetTexture(defaulttexture)
+		draw.SetTexture()
 
 			if lost then
 				draw.Color(0,0,0,100)
@@ -779,7 +779,7 @@ local function drawing()
 
 			if not lost then
 				draw.SetFont(font1)
-				draw.TextShadow(windowx + (windowsizex / 2) - draw.GetTextSize(score), windowy, score)
+				draw.TextShadow(windowx + (windowsizex / 2) - draw.GetTextSize(score), windowy + 5, score)
 			else
 				draw.SetTexture(scoreboardtexture)
 				draw.FilledRect(windowx + windowsizex / 2 - 86, windowy + windowsizey / 2 - 114 - 50, windowx + windowsizex / 2 + 86, windowy + windowsizey / 2 + 114 - 50 )
