@@ -1,11 +1,14 @@
 --Background by Cheeseot--
 local dots = {}
 local menuref = gui.Reference("MENU")
-local groupref = gui.Reference("SETTINGS","Miscellaneous")
+local settingsref = gui.Reference("SETTINGS")
 local oldx, oldy = menuref:GetValue()
 local movex, movey = 0,0
-gui.Text(groupref, "  ")
-local boxthing = gui.Groupbox(groupref, "Background by Cheeseot")
+local bgtab = gui.Tab(settingsref, "bgtab", "Background")
+local boxthing = gui.Groupbox(bgtab, "Background by Cheeseot", 16, 16)
+local dotbox = gui.Checkbox(boxthing, "dotbox", "Dots", 1)
+local linebox = gui.Checkbox(boxthing, "linebox", "Lines", 1)
+local bgbox = gui.Checkbox(boxthing, "bgbox", "Background Fade", 1)
 local dotsizeslider = gui.Slider( boxthing, "sizeslider", "Size", 2, 0, 5 )
 local dotsize = 2
 local dotamountslider = gui.Slider( boxthing, "amountslider", "Amount", 250, 0, 500 )
@@ -14,9 +17,9 @@ local dotspeedslider = gui.Slider( boxthing, "speedslider", "Max. Speed", 50, 0,
 local speed, oldspeed = 5, 5
 local minspeedslider = gui.Slider( boxthing, "minspeedslider", "Min. Speed", 10, 0, 500 )
 local minspeed, oldminspeed = 1, 1
-local dotcolor = gui.ColorEntry( "dotcolor", "Background Dot Color", 255, 255, 255, 130 )
-local linecolor = gui.ColorEntry( "linecolor", "Background Line Color", 255, 255, 255, 65)
-local fadecolor = gui.ColorEntry( "fadecolor", "Background Fade Color", 0, 0, 0, 125)
+local dotcolor = gui.ColorPicker(dotbox, "dotcolor", "Background Dot Color", 255, 255, 255, 130 )
+local linecolor = gui.ColorPicker(linebox, "linecolor", "Background Line Color", 255, 255, 255, 65)
+local fadecolor = gui.ColorPicker(bgbox, "fadecolor", "Background Fade Color", 0, 0, 0, 125)
 local w,h = 1920,1080
 local menux, menuy, menusizex, menusizey, scale = 0, 0, 800, 600, 1
 local solidmenu = gui.Checkbox(boxthing, "solidmenu", "Make Menu Solid", 1)
@@ -63,7 +66,6 @@ local function randompos()
 	end
 end
 
-gui.Text(boxthing, "Change colors in the color settings")
 local randombutton = gui.Button(boxthing, "Randomize Position", randompos)
 
 local function distance(w1,h1,w2,h2)
@@ -115,7 +117,7 @@ minspeedslider:SetValue(minspeed)
 
 local liner,lineg,lineb,linea = linecolor:GetValue()
 
-scale = gui.GetValue("dpi_Scale")
+scale = gui.GetValue("adv.dpi")
 menusizex = 800 * scale
 menusizey = 600 * scale
 menux,menuy = menuref:GetValue()
@@ -287,246 +289,256 @@ menux,menuy = menuref:GetValue()
 	
 	end
 	
-	draw.Color(fadecolor:GetValue())
-	draw.FilledRect(0,0,w,h)
+	if bgbox:GetValue() then
+		draw.Color(fadecolor:GetValue())
+		draw.FilledRect(0,0,w,h)
+	end
 	
 --Background by Cheeseot--
-	
-	local mousex, mousey = input.GetMousePos()
-	
-		for _,dot in ipairs(dots) do
+
+	if dotbox:GetValue() or linebox:GetValue() then
+		local mousex, mousey = input.GetMousePos()
 		
-			if dot[5] > 0.01 then
-				dot[5] = dot[5] * 0.99
-			else
-				dot[5] = 0.01
-			end
-				
-			if dot[6] > 0.01 then
-				dot[6] = dot[6] * 0.99 	
-			else
-				dot[6] = 0.01 
-			end
+			for _,dot in ipairs(dots) do
 			
-			if dot[1] >= w or dot[1] <= 0 then
-				dot[3] = dot[3] * -1
-				dot[5] = dot[5] * 0.9
-				dot[6] = dot[6] * 0.9 
-			end
-			
-			if dot[2] >= h or dot[2] <= 0 then 
-				dot[4] = dot[4] * -1
-				dot[5] = dot[5] * 0.9
-				dot[6] = dot[6] * 0.9 
-			end
-			
-			if dot[1] > w then
-				dot[1] = w 
-			end
-			
-			if dot[1] < 0 then
-				dot[1] = 0
-			end
-			
-			if dot[2] > h then
-				dot[2] = h 
-			end
-			
-			if dot[2] < 0 then
-				dot[2] = 0
-			end
-			
-			if solidmenu:GetValue() then
-			
-				if inRect(dot[1], dot[2], menux - 5, menuy - 4, menux + 20, menuy + menusizey + 4) then
-				
-					dot[3] = dot[3] * -1 
-					dot[5] = dot[5] * 0.9
-					dot[6] = dot[6] * 0.9 
-				
+				if dot[5] > 0.01 then
+					dot[5] = dot[5] * 0.99
+				else
+					dot[5] = 0.01
+				end
+					
+				if dot[6] > 0.01 then
+					dot[6] = dot[6] * 0.99 	
+				else
+					dot[6] = 0.01 
 				end
 				
-				if inRect(dot[1], dot[2], menux + menusizex - 20, menuy - 4, menux + menusizex + 5, menuy + menusizey + 4) then
-				
+				if dot[1] >= w or dot[1] <= 0 then
 					dot[3] = dot[3] * -1
 					dot[5] = dot[5] * 0.9
-					dot[6] = dot[6] * 0.9
-				
+					dot[6] = dot[6] * 0.9 
 				end
 				
-				if inRect(dot[1], dot[2], menux - 4, menuy - 5, menux + menusizex + 4, menuy + 20) then
-				
+				if dot[2] >= h or dot[2] <= 0 then 
 					dot[4] = dot[4] * -1
 					dot[5] = dot[5] * 0.9
 					dot[6] = dot[6] * 0.9 
-				
 				end
 				
-				if inRect(dot[1], dot[2], menux - 4, menuy + menusizey - 20, menux + menusizex + 4, menuy + menusizey + 5) then
-				
-					dot[4] = dot[4] * -1
-					dot[5] = dot[5] * 0.9
-					dot[6] = dot[6] * 0.9 
-				
+				if dot[1] > w then
+					dot[1] = w 
 				end
 				
-				if inRect(dot[1], dot[2], menux - 5, menuy - 5, menux + menusizex + 5, menuy + menusizey + 5) then
+				if dot[1] < 0 then
+					dot[1] = 0
+				end
 				
-					if dot[1] - (menux - 5) < (menux + menusizex + 5) - dot[1] and
-					   dot[1] - (menux - 5) < dot[2] - (menuy - 5) and 
-					   dot[1] - (menux - 5) < (menuy + menusizey + 5) - dot[2] then
-						
-						dot[1] = dot[1] - movex
+				if dot[2] > h then
+					dot[2] = h 
+				end
+				
+				if dot[2] < 0 then
+					dot[2] = 0
+				end
+				
+				if solidmenu:GetValue() then
+				
+					if inRect(dot[1], dot[2], menux - 5, menuy - 4, menux + 20, menuy + menusizey + 4) then
 					
-						if dot[5] < movex / 10 then 
-							dot[5] = movex / 10 
-						end
+						dot[3] = dot[3] * -1 
+						dot[5] = dot[5] * 0.9
+						dot[6] = dot[6] * 0.9 
 					
-						if dot[6] < movey / 10 then 
-							dot[6] = movey / 10
-						end	
 					end
 					
-					if (menux + menusizex + 5) - dot[1] < dot[1] - (menux - 5) and 
-					   (menux + menusizex + 5) - dot[1] < dot[2] - (menuy - 5) and 
-					   (menux + menusizex + 5) - dot[1] < (menuy + menusizey + 5) - dot[2] then
-						
-						dot[1] = dot[1]+movex
+					if inRect(dot[1], dot[2], menux + menusizex - 20, menuy - 4, menux + menusizex + 5, menuy + menusizey + 4) then
 					
-						if dot[5] < movex / 10 then
-							dot[5] = movex / 10
-						end
+						dot[3] = dot[3] * -1
+						dot[5] = dot[5] * 0.9
+						dot[6] = dot[6] * 0.9
 					
-						if dot[6] < movey / 10 then
-							dot[6] = movey / 10
-						end
 					end
 					
-					if dot[2] - (menuy - 5) < dot[1] - (menux - 5) and 
-					   dot[2] - (menuy - 5) < (menux + menusizex + 5) - dot[1] and
-					   dot[2] - (menuy - 5) < (menuy + menusizey + 5) - dot[2] then
+					if inRect(dot[1], dot[2], menux - 4, menuy - 5, menux + menusizex + 4, menuy + 20) then
 					
-						dot[2] = dot[2]-movey
+						dot[4] = dot[4] * -1
+						dot[5] = dot[5] * 0.9
+						dot[6] = dot[6] * 0.9 
 					
-						if dot[6] < movey / 10 then 
-							dot[6] = movey / 10 
-						end
-					
-						if dot[5] < movex / 10 then 
-							dot[5] = movex / 10 
-						end
 					end
 					
-					if (menuy + menusizey + 5) - dot[2] < dot[1] - (menux - 5) and 
-					   (menuy + menusizey + 5) - dot[2] < (menux + menusizex + 5) - dot[1] and
-					   (menuy + menusizey + 5) - dot[2] < dot[2] - (menuy - 5)then
+					if inRect(dot[1], dot[2], menux - 4, menuy + menusizey - 20, menux + menusizex + 4, menuy + menusizey + 5) then
 					
-						dot[2] = dot[2]+movey
+						dot[4] = dot[4] * -1
+						dot[5] = dot[5] * 0.9
+						dot[6] = dot[6] * 0.9 
 					
-						if dot[6] < movey / 10 then 
-							dot[6] = movey / 10
-						end 
-					
-						if dot[5] < movex / 10 then 
-							dot[5] = movex / 10
-						end
 					end
-				end
-			end
-			
---Background by Cheeseot--
-			
-			if constantspeed:GetValue() then
-			
-			local fpsadjust = 600 / getfps()
-			
-				if dot[3] > 0 then
-				
-					dot[1] = dot[1] + (dot[3] + dot[5]) * fpsadjust
-				
-				elseif dot[3] < 0 then
-				
-					dot[1] = dot[1] + (dot[3] - dot[5]) * fpsadjust
 					
-				end
-				
-				if dot[4] > 0 then
-				
-					dot[2] = dot[2] + (dot[4] + dot[6]) * fpsadjust
+					if inRect(dot[1], dot[2], menux - 5, menuy - 5, menux + menusizex + 5, menuy + menusizey + 5) then
 					
-				elseif dot[4] < 0 then
-				
-					dot[2] = dot[2] + (dot[4] - dot[6]) * fpsadjust
-				
-				end
-			else
-			
-			if dot[3] > 0 then
-				
-					dot[1] = dot[1] + (dot[3] + dot[5])
-				
-				elseif dot[3] < 0 then
-				
-					dot[1] = dot[1] + (dot[3] - dot[5])
-					
-				end
-				
-				if dot[4] > 0 then
-				
-					dot[2] = dot[2] + (dot[4] + dot[6])
-					
-				elseif dot[4] < 0 then
-				
-					dot[2] = dot[2] + (dot[4] - dot[6])
-					
-				end
-			
-			end
-			
-			if math.abs(dot[1] - mousex) <= 150 and math.abs(dot[2] - mousey) <=150 then
-			
-				local mousedist = distance(dot[1],dot[2],mousex,mousey)
-			
-				if mousedist < 150 then
-				
-					local fade = (255-(mousedist/1.5)*2.55)*((linea/255)*2)
-					
-						if fade > 255 then 
-							fade = 255 
-						end
-					
-					draw.Color(liner,lineg,lineb,fade)
-					draw.Line(dot[1],dot[2],mousex,mousey)
-					
-					--if mousedist < 25 then
-						--dot[5] = math.random(3,5)
-						--dot[6] = math.random(3,5)
-					--end	
-				end
-			end
-			
-			for __,compare in ipairs(dots) do
-			
-				if dot[1] ~= compare[1] and dot[2] ~= compare[2] then
-				
-					if math.abs(dot[1] - compare[1]) <= 150 and math.abs(dot[2] - compare[2]) <= 150 then
-					
-						local dist = distance(dot[1],dot[2],compare[1],compare[2])
-						
-							if dist < 150 then
+						if dot[1] - (menux - 5) < (menux + menusizex + 5) - dot[1] and
+						dot[1] - (menux - 5) < dot[2] - (menuy - 5) and 
+						dot[1] - (menux - 5) < (menuy + menusizey + 5) - dot[2] then
 							
-								local fade = (255-(dist/1.5)*2.55)*(linea/255)
-								
-								draw.Color(liner,lineb,lineg,fade)
-								draw.Line(dot[1],dot[2],compare[1],compare[2])
+							dot[1] = dot[1] - movex
+						
+							if dot[5] < movex / 10 then 
+								dot[5] = movex / 10 
+							end
+						
+							if dot[6] < movey / 10 then 
+								dot[6] = movey / 10
+							end	
+						end
+						
+						if (menux + menusizex + 5) - dot[1] < dot[1] - (menux - 5) and 
+						(menux + menusizex + 5) - dot[1] < dot[2] - (menuy - 5) and 
+						(menux + menusizex + 5) - dot[1] < (menuy + menusizey + 5) - dot[2] then
+							
+							dot[1] = dot[1]+movex
+						
+							if dot[5] < movex / 10 then
+								dot[5] = movex / 10
+							end
+						
+							if dot[6] < movey / 10 then
+								dot[6] = movey / 10
+							end
+						end
+						
+						if dot[2] - (menuy - 5) < dot[1] - (menux - 5) and 
+						dot[2] - (menuy - 5) < (menux + menusizex + 5) - dot[1] and
+						dot[2] - (menuy - 5) < (menuy + menusizey + 5) - dot[2] then
+						
+							dot[2] = dot[2]-movey
+						
+							if dot[6] < movey / 10 then 
+								dot[6] = movey / 10 
+							end
+						
+							if dot[5] < movex / 10 then 
+								dot[5] = movex / 10 
+							end
+						end
+						
+						if (menuy + menusizey + 5) - dot[2] < dot[1] - (menux - 5) and 
+						(menuy + menusizey + 5) - dot[2] < (menux + menusizex + 5) - dot[1] and
+						(menuy + menusizey + 5) - dot[2] < dot[2] - (menuy - 5)then
+						
+							dot[2] = dot[2]+movey
+						
+							if dot[6] < movey / 10 then 
+								dot[6] = movey / 10
+							end 
+						
+							if dot[5] < movex / 10 then 
+								dot[5] = movex / 10
+							end
 						end
 					end
 				end
+				
+	--Background by Cheeseot--
+				
+				if constantspeed:GetValue() then
+				
+				local fpsadjust = 600 / getfps()
+				
+					if dot[3] > 0 then
+					
+						dot[1] = dot[1] + (dot[3] + dot[5]) * fpsadjust
+					
+					elseif dot[3] < 0 then
+					
+						dot[1] = dot[1] + (dot[3] - dot[5]) * fpsadjust
+						
+					end
+					
+					if dot[4] > 0 then
+					
+						dot[2] = dot[2] + (dot[4] + dot[6]) * fpsadjust
+						
+					elseif dot[4] < 0 then
+					
+						dot[2] = dot[2] + (dot[4] - dot[6]) * fpsadjust
+					
+					end
+				else
+				
+				if dot[3] > 0 then
+					
+						dot[1] = dot[1] + (dot[3] + dot[5])
+					
+					elseif dot[3] < 0 then
+					
+						dot[1] = dot[1] + (dot[3] - dot[5])
+						
+					end
+					
+					if dot[4] > 0 then
+					
+						dot[2] = dot[2] + (dot[4] + dot[6])
+						
+					elseif dot[4] < 0 then
+					
+						dot[2] = dot[2] + (dot[4] - dot[6])
+						
+					end
+				
+				end
+				
+				if math.abs(dot[1] - mousex) <= 150 and math.abs(dot[2] - mousey) <=150 then
+				
+					local mousedist = distance(dot[1],dot[2],mousex,mousey)
+				
+					if mousedist < 150 then
+					
+						local fade = (255-(mousedist/1.5)*2.55)*((linea/255)*2)
+						
+							if fade > 255 then 
+								fade = 255 
+							end
+						
+							if linebox:GetValue() then
+								draw.Color(liner,lineg,lineb,fade)
+								draw.Line(dot[1],dot[2],mousex,mousey)
+							end
+						
+						--if mousedist < 25 then
+							--dot[5] = math.random(3,5)
+							--dot[6] = math.random(3,5)
+						--end	
+					end
+				end
+				
+				if linebox:GetValue() then
+					for __,compare in ipairs(dots) do
+					
+						if dot[1] ~= compare[1] and dot[2] ~= compare[2] then
+						
+							if math.abs(dot[1] - compare[1]) <= 150 and math.abs(dot[2] - compare[2]) <= 150 then
+							
+								local dist = distance(dot[1],dot[2],compare[1],compare[2])
+								
+									if dist < 150 then
+									
+										local fade = (255-(dist/1.5)*2.55)*(linea/255)
+										
+										draw.Color(liner,lineg,lineb,fade)
+										draw.Line(dot[1],dot[2],compare[1],compare[2])
+								end
+							end
+						end
+					end
+				end
+				
+				if dotbox:GetValue() then
+					draw.Color(dotcolor:GetValue())
+					draw.FilledCircle(dot[1],dot[2],dotsize)
+				end
+				
 			end
-			
-			draw.Color(dotcolor:GetValue())
-			draw.FilledCircle(dot[1],dot[2],dotsize)
-			
 		end
 	end
 end
