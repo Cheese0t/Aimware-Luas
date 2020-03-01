@@ -1,13 +1,14 @@
 --Recoil Crosshair by Cheeseot
-local ButtonPosition = gui.Reference( "VISUALS", "MISC", "Assistance" );
-local PunchCheckbox = gui.Checkbox( ButtonPosition, "lua_recoilcrosshair", "Recoil Crosshair", 0 );
-local IdleCheckbox = gui.Checkbox( ButtonPosition, "lua_recoilidle", "Hide Recoil Crosshair When Idle", 0 );
+local ButtonPosition = gui.Reference( "VISUALS", "Other", "Extra" );
+local PunchCheckbox = gui.Checkbox( ButtonPosition, "lua_recoilcrosshair", "Recoil Crosshair", 1 );
+local recoilcolor = gui.ColorPicker(PunchCheckbox, "recoilcolor", "Recoil Crosshair Color", 255,255,255,255)
+local IdleCheckbox = gui.Checkbox( ButtonPosition, "lua_recoilidle", "Hide Recoil Crosshair When Idle", 1 );
 
-function punch()
+local function punch()
 
 local rifle = 0;
 local me = entities.GetLocalPlayer();
-if me ~=nil then
+if me ~= nil and not gui.GetValue("rbot.master") then
     local scoped = me:GetProp("m_bIsScoped");
     if scoped == 256 then scoped = 0 end
     if scoped == 257 then scoped = 1 end
@@ -39,12 +40,13 @@ if me ~=nil then
 
     --Recoil Crosshair by Cheeseot
 
-        if me:IsAlive() and PunchCheckbox:GetValue() and canDraw == 1 then    
-            local punchAngleX, punchAngleY = me:GetPropVector("localdata", "m_Local", "m_aimPunchAngle");
+        if me:IsAlive() and PunchCheckbox:GetValue() and canDraw == 1 then
+            local punchAngleVec = me:GetPropVector("localdata", "m_Local", "m_aimPunchAngle");
+            local punchAngleX, punchAngleY = punchAngleVec.x, punchAngleVec.y
             local w, h = draw.GetScreenSize();
             local x = w / 2;
             local y = h / 2;
-            local fov = gui.GetValue("vis_view_fov");
+            local fov = 90 --gui.GetValue("vis_view_fov");      polak pls add this back
 
             if fov == 0 then
                 fov = 90;
@@ -59,13 +61,10 @@ if me ~=nil then
 			local px = 0
 			local py = 0
 			
-			if (gui.GetValue("vis_norecoil") and gui.GetValue("rbot_active") and gui.GetValue("rbot_antirecoil")) or (gui.GetValue("rbot_active") and gui.GetValue("rbot_antirecoil")) then
-				px = x;
-				py = y;
-			elseif gui.GetValue("vis_norecoil") then
+            if gui.GetValue("esp.other.norecoil") then
 				px = x - (dx * punchAngleY)*1.2;
 				py = y + (dy * punchAngleX)*2;
-			else
+            else
 				px = x - (dx * punchAngleY)*0.6;
 				py = y + (dy * punchAngleX);
 			end
@@ -79,7 +78,7 @@ if me ~=nil then
             if px == x and py == y and snipercrosshair ~=1 then return; end
 			end
 				
-            draw.Color(gui.GetValue("clr_esp_crosshair_recoil"));
+            draw.Color(recoilcolor:GetValue());
             draw.FilledRect(px-3, py-1, px+3, py+1);
             draw.FilledRect(px-1, py-3, px+1, py+3);
             end
