@@ -5,13 +5,13 @@ local BetterSpecBox = gui.Checkbox( specshit, "lua_betterspec", "Simple speclist
 function betterspec()
 local specfont = draw.CreateFont('Vendetta', 20)
 local sorting = 0
-local specpos1, specpos2 = gui.GetValue("wnd_showspec");
+local specpos1, specpos2 = gui.GetValue("spectators");
 	if BetterSpecBox:GetValue() then
-	gui.SetValue("msc_showspec", 0);
+	gui.SetValue("misc.showspec", 0);
 	local lp = entities.GetLocalPlayer();
 		if lp ~= nil then
-			local players = entities.FindByClass("CCSPlayer");
-			for i = 1, #players do
+            local players = entities.FindByClass("CCSPlayer");
+        	for i = 1, #players do
 			local player = players[i];
 				if player ~= lp and player:GetHealth() <= 0 then
 				local name = player:GetName();
@@ -57,4 +57,3 @@ local specpos1, specpos2 = gui.GetValue("wnd_showspec");
 end	
 callbacks.Register ("Draw", "betterspec", betterspec)
 --SimpleSpeclist by Cheeseot
-
