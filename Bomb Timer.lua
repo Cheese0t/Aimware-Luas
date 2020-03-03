@@ -105,12 +105,17 @@ end
 
 local function sitename(site) 
 
-local a_x, a_y, a_z = entities.GetPlayerResources():GetProp("m_bombsiteCenterA") 
-local b_x, b_y, b_z = entities.GetPlayerResources():GetProp("m_bombsiteCenterB") 
-local site_x1, site_y1, site_z1 = site:GetMins() 
-local site_x2, site_y2, site_z2 = site:GetMaxs() 
-local site_x, site_y, site_z = lerp_pos(site_x1, site_y1, site_z1, site_x2, site_y2, site_z2, 0.5) 
-local distance_a, distance_b = vector.Distance(site_x, site_y, site_z, a_x, a_y, a_z), vector.Distance(site_x, site_y, site_z, b_x, b_y, b_z)
+local avec = entities.GetPlayerResources():GetProp("m_bombsiteCenterA")
+local bvec = entities.GetPlayerResources():GetProp("m_bombsiteCenterB")
+local a_x, a_y, a_z = avec.x, avec.y, avec.z
+local b_x, b_y, b_z = bvec.x, bvec.y, bvec.z
+local sitevec1 = site:GetMins() 
+local sitevec2 = site:GetMaxs()
+local site_x1, site_y1, site_z1 = sitevec1.x, sitevec1.y, sitevec1.z 
+local site_x2, site_y2, site_z2 = sitevec2.x, sitevec2.y, sitevec2.z 
+local site_x, site_y, site_z = lerp_pos(site_x1, site_y1, site_z1, site_x2, site_y2, site_z2, 0.5)
+local sitevec = {x = site_x, y = site_y, z = site_z}
+local distance_a, distance_b = vector.Distance(sitevec, avec), vector.Distance(sitevec, bvec)
  
 	return distance_b > distance_a and "A" or "B" 
 
@@ -167,17 +172,19 @@ function DrawingHook()
 	if planting == true then
 
 		local Player = entities.GetLocalPlayer();
-		local ScreenW, ScreenH = draw.GetScreenSize(); 
+        local ScreenW, ScreenH = draw.GetScreenSize();
 		local PlantMath = (globals.CurTime() - plantingStarted) / 3.125
-		local PlantTime = math.floor((((plantingStarted - globals.CurTime()) + 3.125) * 10)) / 10
+        local PlantTime = math.floor((((plantingStarted - globals.CurTime()) + 3.125) * 10)) / 10
+        PlantTime = tostring(PlantTime)
+        if not string.find(PlantTime, "%.") then
+            PlantTime = PlantTime .. ".0"
+        end
 
 		draw.Color(75,225,0,255)
-		draw.Text(ScreenW/100, 2, bombsite .. " - Planting")
-		draw.TextShadow(ScreenW/100, 2, bombsite .. " - Planting")
+		draw.TextShadow(ScreenW/100, 7, bombsite .. " - Planting")
 		draw.Color(255,255,255,255)
 		draw.SetFont(font2)
-		draw.Text(ScreenW/100, 53, planter .. " - " .. PlantTime .. "s")
-		draw.TextShadow(ScreenW/100, 53, planter .. " - " .. PlantTime .. "s")
+		draw.TextShadow(ScreenW/100, 58, planter .. " - " .. PlantTime .. "s")
 		draw.Color(0, 0, 0, 170);
 		draw.FilledRect( 0, 0, ScreenW/200, ScreenH );
 		draw.Color(0, 255, 0, 255);
@@ -230,10 +237,14 @@ function DrawingHook()
 					draw.Color(75, 225, 0, 255);
 
 				end
-				
+                
+                bombtimer = tostring(bombtimer)
+                if not string.find(bombtimer, "%.") then
+                    bombtimer = bombtimer .. ".0"
+                end
+
 				draw.SetFont(font1)
-				draw.Text( ScreenW/100, 2, bombsite .. " - " .. bombtimer .. "s");
-				draw.TextShadow( ScreenW/100, 2, bombsite .. " - " .. bombtimer .. "s");
+				draw.TextShadow( ScreenW/100, 7, bombsite .. " - " .. bombtimer .. "s");
 				draw.Color(255, 255, 255, 255);
 
 				if Bomb:GetProp("m_flDefuseCountDown") > Bomb:GetProp("m_flC4Blow") then
@@ -243,10 +254,14 @@ function DrawingHook()
 				end
 				
 				local defusetime = math.floor( (Bomb:GetProp("m_flDefuseCountDown") - globals.CurTime()) * 10 ) / 10
-				
+                
+                defusetime = tostring(defusetime)
+                if not string.find(defusetime, "%.") then
+                    defusetime = defusetime .. ".0"
+                end
+
 				draw.SetFont(font2)
-				draw.Text(ScreenW/100, 53, "Defusing - " .. defusetime .. "s")
-				draw.TextShadow(ScreenW/100, 53, "Defusing - " .. defusetime .. "s")
+				draw.TextShadow(ScreenW/100, 58, "Defusing - " .. defusetime .. "s")
 				
 				if Player:GetTeamNumber() == 3 then
 				if Player:GetPropBool("m_bHasDefuser") == true then
@@ -281,10 +296,14 @@ function DrawingHook()
 					draw.Color(75, 225, 0, 255);
 
 				end
-				
+                
+                bombtimer = tostring(bombtimer)
+                if not string.find(bombtimer, "%.") then
+                    bombtimer = bombtimer .. ".0"
+                end
+
 				draw.SetFont(font1)
-				draw.Text( ScreenW/100, 2, bombsite .. " - " .. bombtimer .. "s");
-				draw.TextShadow( ScreenW/100, 2, bombsite .. " - " .. bombtimer .. "s");
+				draw.TextShadow( ScreenW/100, 7, bombsite .. " - " .. bombtimer .. "s");
 				
 				if Player:GetTeamNumber() == 3 then
 				if Player:GetPropBool("m_bHasDefuser") == true then
@@ -308,8 +327,7 @@ function DrawingHook()
 					draw.Color(240, 20, 0, 255)
 					draw.SetFont(font2)
 					local formatting = draw.GetTextSize("FATAL")
-					draw.Text(ScreenW/2 - formatting/2, ScreenH/20, "FATAL");
-					draw.TextShadow(ScreenW/2 - formatting/2, ScreenH/20, "FATAL");
+					draw.TextShadow(ScreenW/2 - formatting/2, ScreenH/20 + 5, "FATAL");
 				
 				elseif hpleft <= 0 then return
 				
@@ -318,8 +336,7 @@ function DrawingHook()
 					draw.Color(75, 225, 0, 255)
 					draw.SetFont(font2)
 					local formattinghp = draw.GetTextSize("-" .. hpleft .. " HP")
-					draw.Text(ScreenW/2 - formattinghp/2, ScreenH/20, "-" .. hpleft .. " HP");
-					draw.TextShadow(ScreenW/2 - formattinghp/2, ScreenH/20, "-" .. hpleft .. " HP");
+					draw.TextShadow(ScreenW/2 - formattinghp/2, ScreenH/20 + 5, "-" .. hpleft .. " HP");
 					
 				end
 			end
@@ -338,8 +355,7 @@ function DrawingHook()
 					draw.Color(240, 20, 0, 255)
 					draw.SetFont(font2)
 					local formatting = draw.GetTextSize("FATAL")
-					draw.Text(ScreenW/2 - formatting/2, ScreenH/20, "FATAL");
-					draw.TextShadow(ScreenW/2 - formatting/2, ScreenH/20, "FATAL");
+					draw.TextShadow(ScreenW/2 - formatting/2, ScreenH/20 + 5, "FATAL");
 				
 				elseif hpleft <= 0 then return
 				
@@ -348,8 +364,7 @@ function DrawingHook()
 					draw.Color(75, 225, 0, 255)
 					draw.SetFont(font2)
 					local formattinghp = draw.GetTextSize("-" .. hpleft .. " HP")
-					draw.Text(ScreenW/2 - formattinghp/2, ScreenH/20, "-" .. hpleft .. " HP");
-					draw.TextShadow(ScreenW/2 - formattinghp/2, ScreenH/20, "-" .. hpleft .. " HP");
+					draw.TextShadow(ScreenW/2 - formattinghp/2, ScreenH/20 + 5, "-" .. hpleft .. " HP");
 					
 				end
 			end
@@ -359,9 +374,12 @@ end
 
 function BombDamage(Bomb, Player)
 
-	local C4Distance = math.sqrt((select(1,Bomb:GetAbsOrigin()) - select(1,Player:GetAbsOrigin())) ^ 2 + 
-	(select(2,Bomb:GetAbsOrigin()) - select(2,Player:GetAbsOrigin())) ^ 2 + 
-	(select(3,Bomb:GetAbsOrigin()) - select(3,Player:GetAbsOrigin())) ^ 2);
+    local playerOrigin = Player:GetAbsOrigin()
+    local bombOrigin = Bomb:GetAbsOrigin()
+
+	local C4Distance = math.sqrt((bombOrigin.x - playerOrigin.x) ^ 2 + 
+	(bombOrigin.y - playerOrigin.y) ^ 2 + 
+	(bombOrigin.z - playerOrigin.z) ^ 2);
 
 	local Gauss = (C4Distance - 75.68) / 789.2 
 	local flDamage = 450.7 * math.exp(-Gauss * Gauss);
