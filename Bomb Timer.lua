@@ -109,14 +109,13 @@ local avec = entities.GetPlayerResources():GetProp("m_bombsiteCenterA")
 local bvec = entities.GetPlayerResources():GetProp("m_bombsiteCenterB")
 local a_x, a_y, a_z = avec.x, avec.y, avec.z
 local b_x, b_y, b_z = bvec.x, bvec.y, bvec.z
-local sitevec1 = site:GetMins() 
+local sitevec1 = site:GetMins()
 local sitevec2 = site:GetMaxs()
 local site_x1, site_y1, site_z1 = sitevec1.x, sitevec1.y, sitevec1.z 
 local site_x2, site_y2, site_z2 = sitevec2.x, sitevec2.y, sitevec2.z 
 local site_x, site_y, site_z = lerp_pos(site_x1, site_y1, site_z1, site_x2, site_y2, site_z2, 0.5)
-local sitevec = {x = site_x, y = site_y, z = site_z}
-local distance_a, distance_b = vector.Distance(sitevec, avec), vector.Distance(sitevec, bvec)
- 
+local distance_a, distance_b = vector.Distance({site_x, site_y, site_z}, {a_x, a_y, a_z}), vector.Distance({site_x, site_y, site_z}, {b_x, b_y, b_z})
+
 	return distance_b > distance_a and "A" or "B" 
 
 end
