@@ -9,6 +9,7 @@ local function punch()
 local rifle = 0;
 local me = entities.GetLocalPlayer();
 if me ~= nil and not gui.GetValue("rbot.master") then
+    if me:IsAlive() then
     local scoped = me:GetProp("m_bIsScoped");
     if scoped == 256 then scoped = 0 end
     if scoped == 257 then scoped = 1 end
@@ -17,7 +18,7 @@ if me ~= nil and not gui.GetValue("rbot.master") then
         local weapon_name = my_weapon:GetClass();
         local canDraw = 0;
         local snipercrosshair = 0;
-        weapon_name = weapon_name:gsub("CWeapon", "");
+        weapon_name = string.gsub(weapon_name, "CWeapon", "");
         if weapon_name == "Aug" or weapon_name == "SG556" then
             rifle = 1;
             else
@@ -40,7 +41,7 @@ if me ~= nil and not gui.GetValue("rbot.master") then
 
     --Recoil Crosshair by Cheeseot
 
-        if me:IsAlive() and PunchCheckbox:GetValue() and canDraw == 1 then
+        if PunchCheckbox:GetValue() and canDraw == 1 then
             local punchAngleVec = me:GetPropVector("localdata", "m_Local", "m_aimPunchAngle");
             local punchAngleX, punchAngleY = punchAngleVec.x, punchAngleVec.y
             local w, h = draw.GetScreenSize();
@@ -83,6 +84,7 @@ if me ~= nil and not gui.GetValue("rbot.master") then
             draw.FilledRect(px-1, py-3, px+1, py+3);
             end
         end
+    end
     end
 end
 callbacks.Register("Draw", "punch", punch);
