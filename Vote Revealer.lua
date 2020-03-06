@@ -12,9 +12,16 @@ local yescount = 0
 local nocount = 0
 local voteresult = 0
 local displayed = 0
+local scrnw, scrnh = 0
 
 local timer = timer or {}
 local timers = {}
+
+local function screensize()
+    scrnw, scrnh = draw.GetScreenSize()
+end
+
+callbacks.Register("Draw", screensize)
 
 local function timerCreate(name, delay, times, func)
 
@@ -131,7 +138,7 @@ local function drawMultiColorText(x, y, lines)
 end
 
 local function showVotes(count, color, text, layer)
-    local y = 650 + (42 * (count - 1));
+    local y = scrnh / 2 - 15 + scrnh/10 - 8  + 9 + (36 * (count - 1));
     local w, h = getMultiColorTextSize(text)
     local mw = w < 50 and 50 or w
     if globals.RealTime() < layer.delay then
@@ -175,7 +182,10 @@ local function voteCast(e)
 		animend = 0;
 		local index = e:GetInt("entityid");
 		local vote = e:GetInt("vote_option");
-		local name = client.GetPlayerNameByIndex(index)
+        local name = client.GetPlayerNameByIndex(index)
+        if (string.len(name) > 20) then
+            name = string.sub(name, 0, 15) .. "..."
+        end
 		
 		local votearray = {};
 		local namearray = {};
@@ -229,37 +239,37 @@ local votetypename = ""
 			votetypename = "Call a timeout"
 		else return
 		end
-			draw.Color(255,150,0,255)
-			draw.FilledRect(0, 525, draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) + 30, 625)
-			draw.Color(10,10,10,255)
-			draw.FilledRect(0, 525, draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) + 20, 625)
-			draw.Color(150,185,1,255)
-			draw.Text(5 + (draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) / 2) - 25 - (draw.GetTextSize("  Yes")), 595, yescount .. " Yes") 
-			draw.Color(185,20,1,255)
-			draw.Text(5 + (draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) / 2) + 25 , 595, nocount .. " No") 
-			draw.Color(255,150,0,255)
-			draw.Text(5, 550, votername) 
-			draw.Color(255,255,255,255)
-			draw.Text(draw.GetTextSize(votername .. " ") + 5, 550, "wants to ")
-			if votetype == 0 then draw.Color(255,255,255,255) else draw.Color(255,150,0,255) end
-			draw.Text(draw.GetTextSize(votername .. " wants to ") + 5, 550, votetypename)
-			draw.Color(255,150,0,255)
-			draw.Text(draw.GetTextSize(votername .. " wants to " .. votetypename) + 5, 550, votetarget)
-	elseif enemyvote == 2 and displayed == 1 then
-		if voteresult == 1 then
-			draw.Color(150,185,1,255)
-			draw.FilledRect(0, 525, draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) + 30, 625)
-			draw.Color(10,10,10,255)
-			draw.FilledRect(0, 525, draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) + 20, 625)
-			draw.Color(150,185,1,255)
-			draw.Text(5, 575 - 10 , "Vote Passed.") 
-		elseif voteresult == 2 then
-			draw.Color(185,20,1,255)
-			draw.FilledRect(0, 525, draw.GetTextSize("Vote Failed.") + 110, 625)
-			draw.Color(10,10,10,255)
-			draw.FilledRect(0, 525, draw.GetTextSize("Vote Failed.") + 100, 625)
-			draw.Color(185,20,1,255)
-			draw.Text(50, 575 - 10, "Vote Failed.") 
+            draw.Color(255,150,0,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) + 30, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(10,10,10,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) + 20, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(150,185,1,255)
+            draw.Text(5 + (draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) / 2) - 25 - (draw.GetTextSize("  Yes")), scrnh/2 + scrnh/20, yescount .. " Yes") 
+            draw.Color(185,20,1,255)
+            draw.Text(5 + (draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) / 2) + 25 , scrnh/2 + scrnh/20, nocount .. " No") 
+            draw.Color(255,150,0,255)
+            draw.Text(5, scrnh/2 + scrnh/100, votername) 
+            draw.Color(255,255,255,255)
+            draw.Text(draw.GetTextSize(votername .. " ") + 5, scrnh/2 + scrnh/100, "wants to ")
+            if votetype == 0 then draw.Color(255,255,255,255) else draw.Color(255,150,0,255) end
+            draw.Text(draw.GetTextSize(votername .. " wants to ") + 5, scrnh/2 + scrnh/100, votetypename)
+            draw.Color(255,150,0,255)
+            draw.Text(draw.GetTextSize(votername .. " wants to " .. votetypename) + 5, scrnh/2 + scrnh/100, votetarget)
+    elseif enemyvote == 2 and displayed == 1 then
+        if voteresult == 1 then
+            draw.Color(150,185,1,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize("Vote Passed") + 110, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(10,10,10,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize("Vote Passed") + 100, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(150,185,1,255)
+            draw.Text(50, scrnh/2 + scrnh/36, "Vote Passed") 
+        elseif voteresult == 2 then
+            draw.Color(185,20,1,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize("Vote Failed") + 110, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(10,10,10,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize("Vote Failed") + 100, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(185,20,1,255)
+            draw.Text(50, scrnh/2 + scrnh/36, "Vote Failed")  
 		end
 	end
 
