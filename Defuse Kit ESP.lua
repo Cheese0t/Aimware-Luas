@@ -93,19 +93,19 @@ local lp = entities.GetLocalPlayer()
 	if lp == nil then shouldGetKits = 0 return end
 	if lp:GetTeamNumber() == 3 then	
 		if lp:GetPropBool("m_bHasDefuser") == false then
-			if curtime + 1 <= globals.CurTime() then
+      if curtime + 1 <= globals.CurTime() then
 			curtime = globals.CurTime()
 			kits = {}
-				for i,v in pairs(entities.FindByClass("CEconEntity")) do
-					if v:GetName() == "EconEntity" then
+        for i,v in ipairs(entities.FindByClass("CEconEntity")) do
+          if v:GetName() == "CEconEntity" then
 						table.insert(kits, v)
 					end
 				end
 			end
-			if shouldGetKits == 1 then
+            if shouldGetKits == 1 then
 				kits = {}
-				for i,v in pairs(entities.FindByClass("CEconEntity")) do
-					if v:GetName() == "EconEntity" then
+        for i,v in ipairs(entities.FindByClass("CEconEntity")) do
+            if v:GetName() == "CEconEntity" then 
 						table.insert(kits, v)
 					end
 				shouldGetKits = 0
@@ -122,7 +122,7 @@ end
 callbacks.Register("Draw",getKits)
 
 local function events(event)
-	if event:GetName() == "player_death" then
+    if event:GetName() == "player_death" then
 		local id = event:GetInt("userid")
 		local ent = entities.GetByUserID(id)
 		if ent ~= nil then
@@ -148,16 +148,16 @@ callbacks.Register("FireGameEvent",events)
 
 local function kitESP()
 local lp = entities.GetLocalPlayer()
-	if lp == nil then return end
-	if lp:GetTeamNumber() == 3 then	
-		if lp:GetPropBool("m_bHasDefuser") == false then
-		local lpx, lpy, lpz = lp:GetAbsOrigin()		
-			for i,v in pairs(kits) do
-				if v ~= nil then
-				local kitx, kity, kitz = v:GetAbsOrigin()
-					local x, y = client.WorldToScreen( kitx, kity, kitz )
+    if lp == nil then return end
+    if lp:GetTeamNumber() == 3 then	
+        if lp:GetPropBool("m_bHasDefuser") == false then
+		local lpVec = lp:GetAbsOrigin()		
+            for i,v in pairs(kits) do
+                if v ~= nil then
+                local kitVec = v:GetAbsOrigin()
+                    local x, y = client.WorldToScreen(kitVec)
 					if x ~= nil and y ~= nil then
-						local distance = vector.Distance({lpx,lpy,lpz},{kitx,kity,kitz})
+                        local distance = vector.Distance(lpVec, kitVec)
 						local resize = 40 / (distance / 1000)
 						if resize > 40 then resize = 40 end
 						if resize < 25 then resize = 25 end
