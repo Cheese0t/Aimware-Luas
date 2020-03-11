@@ -20,6 +20,7 @@ local aFont = draw.CreateFont("Impact", 30)
 local bFont = draw.CreateFont("Tahoma", 24)
 local cFont = draw.CreateFont("Tahoma Bold", 28)
 local icons = draw.CreateFont("Webdings", 30)
+local smallfont = draw.CreateFont("Tahoma", 12)
 local dragging_offset_x, dragging_offset_x = 0, 0
 local is_dragging = false
 local startscreen = true
@@ -186,7 +187,7 @@ local function drawboard()
   if (left_mouse_down) then
     dragHandler();
   end
-  draw.Color(100,100,100,100)
+  draw.Color(25,25,25,150)
   draw.FilledRect(posx, posy - 35, posx + boardw * 30, posy)
   draw.Color(255,255,255,255)
   draw.SetFont(aFont)
@@ -205,6 +206,14 @@ local function drawboard()
     draw.Color(255,255,255,100)
   end
   draw.Text(posx + (boardw * 30) - 33, posy - 30 , "r")
+  draw.Color(25,25,25,150)
+  draw.FilledRect(posx, posy + boardh * 30, posx + boardw * 30, posy + boardh * 30 + 15)
+  draw.Color(255,255,255,100)
+  draw.Text(posx + 5)
+  draw.OutlinedRect(posx - 1, posy - 36, posx + boardw * 30 + 1, posy + boardh * 30 + 16)
+  draw.SetFont(smallfont)
+  draw.Color(255,255,255,50)
+  draw.Text(posx + 5, posy + boardh * 30 + 3, "Made by: Cheeseot")
   draw.SetFont(aFont)
   if not startscreen then
     draw.Color(0,0,0,150)
@@ -356,7 +365,7 @@ local function drawboard()
       end
     end
     if hiddencount <= bombcount and not lost then won = true end
-    if (failed or won) and failstep > bombcount + 15 then
+    if (failed or won) and failstep > bombcount + 10 then
       draw.Color(0,0,0,200)
       draw.FilledRect(posx + boardmidx - 100, posy + boardmidy - 85, posx + boardmidx + 100, posy + boardmidy + 85)
       draw.Color(255,255,255,100)
