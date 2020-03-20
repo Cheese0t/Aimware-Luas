@@ -17,8 +17,8 @@ local specpos1, specpos2 = gui.GetValue("spectators")
 				local name = player:GetName()
 					if player:GetPropEntity("m_hObserverTarget") ~= nil then
 					local playerindex = player:GetIndex()
-					--local botcheck = client.GetPlayerInfo(playerindex)
-						--if (not botcheck["IsGOTV"] and not botcheck["IsBot"]) then
+					local botcheck = client.GetPlayerInfo(playerindex)
+						if (not botcheck["IsGOTV"] and not botcheck["IsBot"]) then
 						local target = player:GetPropEntity("m_hObserverTarget");
 							if target:IsPlayer() then
 							local targetindex = target:GetIndex()
@@ -31,8 +31,7 @@ local specpos1, specpos2 = gui.GetValue("spectators")
 									draw.TextShadow( specpos1, specpos2 + (sorting * 16), name )
 									sorting = sorting + 1
 									end
-								end
-									
+								end	
 								if not lp:IsAlive() then
 									if lp:GetPropEntity("m_hObserverTarget") ~= nil then
 									local myspec = lp:GetPropEntity("m_hObserverTarget")
@@ -45,10 +44,9 @@ local specpos1, specpos2 = gui.GetValue("spectators")
 									sorting = sorting + 1
 									end
 								end
-								
 								end
 							end
-						--end
+						end
 					end
 				end
 			end
