@@ -4,6 +4,7 @@ local planter = "???";
 local planting = false;
 local bombsite = "???";
 local plantingStarted = 0;
+local display = false
 
 local iconData = [[<svg width="40" height="40">
   <title>Layer 1</title>
@@ -107,14 +108,10 @@ local function sitename(site)
 
 local avec = entities.GetPlayerResources():GetProp("m_bombsiteCenterA")
 local bvec = entities.GetPlayerResources():GetProp("m_bombsiteCenterB")
-local a_x, a_y, a_z = avec.x, avec.y, avec.z
-local b_x, b_y, b_z = bvec.x, bvec.y, bvec.z
 local sitevec1 = site:GetMins()
 local sitevec2 = site:GetMaxs()
-local site_x1, site_y1, site_z1 = sitevec1.x, sitevec1.y, sitevec1.z 
-local site_x2, site_y2, site_z2 = sitevec2.x, sitevec2.y, sitevec2.z 
-local site_x, site_y, site_z = lerp_pos(site_x1, site_y1, site_z1, site_x2, site_y2, site_z2, 0.5)
-local distance_a, distance_b = vector.Distance({site_x, site_y, site_z}, {a_x, a_y, a_z}), vector.Distance({site_x, site_y, site_z}, {b_x, b_y, b_z})
+local site_x, site_y, site_z = lerp_pos(sitevec1.x, sitevec1.y, sitevec1.z , sitevec2.x, sitevec2.y, sitevec2.z, 0.5)
+local distance_a, distance_b = vector.Distance({site_x, site_y, site_z}, {avec.x, avec.y, avec.z}), vector.Distance({site_x, site_y, site_z}, {bvec.x, bvec.y, bvec.z})
 
 	return distance_b > distance_a and "A" or "B" 
 
@@ -123,7 +120,8 @@ end
 function EventHook(Event)
 
 	if Event:GetName() == "bomb_beginplant" then 
-	
+		
+		display = true
 		planter = client.GetPlayerNameByUserID(Event:GetInt("userid")) 
 		plantingStarted = globals.CurTime() 
 		bombsite = sitename(entities.GetByIndex(Event:GetInt("site")))
@@ -134,27 +132,29 @@ function EventHook(Event)
 	
 	if Event:GetName() == "bomb_abortplant" then 
 	
+		display = false
 		planting = false
 		
 	end
 	
 	if Event:GetName() == "bomb_begindefuse" then
-	
-		defusing = true;
+		
+		defusing = true
 	
 	elseif Event:GetName() == "bomb_abortdefuse" then
 	
-		defusing = false;
+		defusing = false
 	
 	elseif Event:GetName() == "round_officially_ended" or Event:GetName() == "bomb_defused" or Event:GetName() == "bomb_exploded" then
-	
-		defusing = false;
+		
+		display = false
+		defusing = false
 		planting = false
 	
 	end
 	
 	if Event:GetName() == "bomb_planted" then
-	
+
 		plantedat = globals.CurTime()
 		planting = false
 	
@@ -164,6 +164,7 @@ end
 
 function DrawingHook()
 
+	if display then
 	local font1 = draw.CreateFont("Verdana", 30)
 	local font2 = draw.CreateFont("Verdana", 23)
 	draw.SetFont(font1)
@@ -368,6 +369,7 @@ function DrawingHook()
 				end
 			end
 		end
+	end
 	end
 end
 
