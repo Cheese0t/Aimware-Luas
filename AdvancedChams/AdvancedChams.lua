@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "1.1b"
+local VERSION_NUMBER = "1.2"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -158,6 +158,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "enemy.vis.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "enemy.vis.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "enemy.vis.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "enemy.vis.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "enemy.vis.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "enemy.vis.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "enemy.vis.rimboost", "Boost", 0),
@@ -175,6 +176,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "enemy.iz.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "enemy.iz.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "enemy.iz.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "enemy.iz.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "enemy.iz.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "enemy.iz.rimboost", "Boost", 0),
@@ -192,6 +194,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "enemy.attvis.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "enemy.attvis.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "enemy.attvis.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "enemy.attvis.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "enemy.attvis.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "enemy.attvis.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "enemy.attvis.rimboost", "Boost", 0),
@@ -209,6 +212,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "enemy.attiz.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "enemy.attiz.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "enemy.attiz.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "enemy.attiz.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "enemy.attiz.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "enemy.attiz.rimboost", "Boost", 0),
@@ -228,6 +232,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "friend.vis.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "friend.vis.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "friend.vis.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "friend.vis.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "friend.vis.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "friend.vis.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "friend.vis.rimboost", "Boost", 0),
@@ -245,6 +250,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "friend.iz.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "friend.iz.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "friend.iz.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "friend.iz.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "friend.iz.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "friend.iz.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "friend.iz.rimboost", "Boost", 0),
@@ -262,6 +268,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "friend.attvis.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "friend.attvis.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "friend.attvis.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "friend.attvis.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "friend.attvis.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "friend.attvis.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "friend.attvis.rimboost", "Boost", 0),
@@ -279,6 +286,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "friend.attiz.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "friend.attiz.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "friend.attiz.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "friend.attiz.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "friend.attiz.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "friend.attiz.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "friend.attiz.rimboost", "Boost", 0),
@@ -298,6 +306,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "loc.vis.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "loc.vis.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "loc.vis.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "loc.vis.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "loc.vis.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "loc.vis.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "loc.vis.rimboost", "Boost", 0),
@@ -315,6 +324,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "loc.iz.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "loc.iz.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "loc.iz.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "loc.iz.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "loc.iz.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "loc.iz.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "loc.iz.rimboost", "Boost", 0),
@@ -332,6 +342,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "loc.attvis.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "loc.attvis.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "loc.attvis.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "loc.attvis.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "loc.attvis.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "loc.attvis.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "loc.attvis.rimboost", "Boost", 0),
@@ -349,6 +360,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "loc.attiz.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "loc.attiz.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "loc.attiz.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "loc.attiz.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "loc.attiz.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "loc.attiz.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "loc.attiz.rimboost", "Boost", 0),
@@ -368,6 +380,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "vm.arms.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "vm.arms.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "vm.arms.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "vm.arms.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "vm.arms.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "vm.arms.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "vm.arms.rimboost", "Boost", 0),
@@ -385,6 +398,7 @@ local settings = {
 			reflectboost = gui.Checkbox(group, "vm.weapon.reflectboost", "Boost", 0),
 			reflectclr = gui.ColorPicker(group, "vm.weapon.reflect.clr", "", 255, 255, 255, 255 ),
 			shine = gui.Slider(group, "vm.weapon.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "vm.weapon.shineclr", "", 255, 255, 255, 255 ),
 			shineboost = gui.Checkbox(group, "vm.weapon.shineboost", "Boost", 0),
 			rim = gui.Slider(group, "vm.weapon.rim", "Rimlight", 0, 0, 10, 0.01 ),
 			rimboost = gui.Checkbox(group, "vm.weapon.rimboost", "Boost", 0),
@@ -407,6 +421,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -424,6 +439,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -441,6 +457,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -458,6 +475,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -477,6 +495,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -494,6 +513,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -511,6 +531,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -528,6 +549,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -547,6 +569,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -564,6 +587,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -581,6 +605,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -598,6 +623,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -617,6 +643,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -634,6 +661,7 @@ local cached = {
 			reflectboost = nil,
 			reflectclr = {r = nil, g = nil, b = nil},
 			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
 			shineboost = nil,
 			rim = nil,
 			rimboost = nil,
@@ -689,6 +717,8 @@ local function SetupMenu()
 			setting.reflectclr:SetPosY(75)
 			setting.shine:SetWidth(475)
 			setting.shine:SetPosY(128)
+			setting.shineclr:SetPosX(-101)
+			setting.shineclr:SetPosY(128)
 			setting.shineboost:SetDescription("Value multiplier")
 			setting.shineboost:SetPosX(490)
 			setting.shineboost:SetPosY(128)
@@ -737,6 +767,7 @@ local function HideSettings(i)
 			settings[modename][typename]["reflectboost"]:SetInvisible(false)
 			settings[modename][typename]["reflectclr"]:SetInvisible(false)
 			settings[modename][typename]["shine"]:SetInvisible(false)
+			settings[modename][typename]["shineclr"]:SetInvisible(false)
 			settings[modename][typename]["shineboost"]:SetInvisible(false)
 			settings[modename][typename]["rim"]:SetInvisible(false)
 			settings[modename][typename]["rimboost"]:SetInvisible(false)
@@ -758,6 +789,7 @@ local function HideSettings(i)
 			settings[modename][typename]["reflectboost"]:SetInvisible(false)
 			settings[modename][typename]["reflectclr"]:SetInvisible(false)
 			settings[modename][typename]["shine"]:SetInvisible(true)
+			settings[modename][typename]["shineclr"]:SetInvisible(true)
 			settings[modename][typename]["shineboost"]:SetInvisible(true)
 			settings[modename][typename]["rim"]:SetInvisible(true)
 			settings[modename][typename]["rimboost"]:SetInvisible(true)
@@ -779,6 +811,7 @@ local function HideSettings(i)
 			settings[modename][typename]["reflectboost"]:SetInvisible(true)
 			settings[modename][typename]["reflectclr"]:SetInvisible(true)
 			settings[modename][typename]["shine"]:SetInvisible(true)
+			settings[modename][typename]["shineclr"]:SetInvisible(true)
 			settings[modename][typename]["shineboost"]:SetInvisible(true)
 			settings[modename][typename]["rim"]:SetInvisible(true)
 			settings[modename][typename]["rimboost"]:SetInvisible(true)
@@ -845,6 +878,7 @@ local function DispatchMaterial(i)
 		local reflectr, reflectg, reflectb = settings[modename][typename]["reflectclr"]:GetValue()
 		local reflecta = settings[modename][typename]["reflect"]:GetValue()
 		local shinevalue = settings[modename][typename]["shine"]:GetValue()
+		local shiner, shineg, shineb = settings[modename][typename]["shineclr"]:GetValue()
 		local rimvalue = settings[modename][typename]["rim"]:GetValue()
 		local pearlvalue = settings[modename][typename]["pearl"]:GetValue()
 		local ignorez = 0
@@ -884,11 +918,13 @@ local function DispatchMaterial(i)
 			"$basemapalphaphongmask" 	"1"
 			"$phongboost" 				"]].. shinevalue ..[["
 			"$rimlight" 				"1"
+			"$phongtint" 				"[]].. shiner/255 .. " " .. shineg/255 .. " " .. shineb/255 .. [[]"
 			"$rimlightexponent" 		"9999999"
 			"$rimlightboost" 			"]].. rimvalue ..[["
 			"$pearlescent" 				"]].. pearlvalue ..[["
 			"$alpha" 					"]].. a/255 ..[["
 			"$ignorez"					"]].. ignorez ..[["
+			"$selfillum" 				"1"
 
 			"Proxies"
 			{
@@ -931,6 +967,7 @@ local function DispatchMaterial(i)
 			local vmt = [["UnlitGeneric" {
 				"$color" 					"[]].. r/255 .. " " .. g/255 .. " " .. b/255 ..[[]"
 				"$alpha" 					"]].. a/255 ..[["
+				"$selfillum" 				"1"
 				"$wireframe"				"1"
 				"$ignorez"					"]].. ignorez ..[["
 				}]]
@@ -977,6 +1014,7 @@ local function CheckChanges()
 
 		local baser, baseg, baseb, basea = setting.baseclr:GetValue()
 		local reflectr, reflectg, reflectb = setting.reflectclr:GetValue()
+		local shiner, shineg, shineb = setting.shineclr:GetValue()
 
 		if cache.base ~= setting.base:GetValue() or
 		cache.baseclr.r ~= baser or cache.baseclr.g ~= baseg or cache.baseclr.b ~= baseb or cache.baseclr.a ~= basea or
@@ -984,6 +1022,7 @@ local function CheckChanges()
 		cache.reflectboost ~= setting.reflectboost:GetValue() or
 		cache.reflectclr.r ~= reflectr or cache.reflectclr.g ~= reflectg or cache.reflectclr.b ~= reflectb or
 		cache.shine ~= setting.shine:GetValue() or
+		cache.shineclr.r ~= shiner or cache.shineclr.g ~= shineg or cache.shineclr.b ~= shineb or
 		cache.shineboost ~= setting.shineboost:GetValue() or
 		cache.rim ~= setting.rim:GetValue() or
 		cache.rimboost ~= setting.rimboost:GetValue() or
@@ -1096,6 +1135,9 @@ local function CheckChanges()
 			cache.reflectclr.g = reflectg
 			cache.reflectclr.b = reflectb
 			cache.shine = setting.shine:GetValue()
+			cache.shineclr.r = shiner 
+			cache.shineclr.g = shineg 
+			cache.shineclr.b = shineb
 			cache.shineboost = setting.shineboost:GetValue()
 			cache.rim = setting.rim:GetValue()
 			cache.rimboost = setting.rimboost:GetValue()
