@@ -15,7 +15,7 @@ local fadein = 0
 
 local function handleUpdates()
 	if updateframes < 5.5 then
-		if up_to_date or updateframes < 0.2 then
+		if up_to_date or updateframes < 0.25 then
 			updateframes = updateframes + globals.AbsoluteFrameTime()
 			if updateframes > 5 then
 				fadeout = ((updateframes - 5) * 510)
