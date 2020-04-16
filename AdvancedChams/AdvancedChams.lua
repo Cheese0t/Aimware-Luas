@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "1.2b"
+local VERSION_NUMBER = "1.3"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -871,28 +871,28 @@ HideSettings(1)
 HideSettings(2)
 HideSettings(3)
 
-local function DispatchMaterial(i)
+local function DispatchMaterial(i, dmode, dtype)
 	if i == 1 then
-		local r, g, b, a = settings[modename][typename]["baseclr"]:GetValue()
-		local reflectr, reflectg, reflectb = settings[modename][typename]["reflectclr"]:GetValue()
-		local reflecta = settings[modename][typename]["reflect"]:GetValue()
-		local shinevalue = settings[modename][typename]["shine"]:GetValue()
-		local shiner, shineg, shineb = settings[modename][typename]["shineclr"]:GetValue()
-		local rimvalue = settings[modename][typename]["rim"]:GetValue()
-		local pearlvalue = settings[modename][typename]["pearl"]:GetValue()
+		local r, g, b, a = settings[dmode][dtype]["baseclr"]:GetValue()
+		local reflectr, reflectg, reflectb = settings[dmode][dtype]["reflectclr"]:GetValue()
+		local reflecta = settings[dmode][dtype]["reflect"]:GetValue()
+		local shinevalue = settings[dmode][dtype]["shine"]:GetValue()
+		local shiner, shineg, shineb = settings[dmode][dtype]["shineclr"]:GetValue()
+		local rimvalue = settings[dmode][dtype]["rim"]:GetValue()
+		local pearlvalue = settings[dmode][dtype]["pearl"]:GetValue()
 		local ignorez = 0
 		local materialtype = "VertexLitGeneric"
-		if settings[modename][typename]["reflectboost"]:GetValue() then
+		if settings[dmode][dtype]["reflectboost"]:GetValue() then
 			reflecta = reflecta * 10
 		end
-		if settings[modename][typename]["shineboost"]:GetValue() then
+		if settings[dmode][dtype]["shineboost"]:GetValue() then
 			shinevalue = shinevalue * 1000
 		end
-		if settings[modename][typename]["rimboost"]:GetValue() then
+		if settings[dmode][dtype]["rimboost"]:GetValue() then
 			rimvalue = rimvalue * 100
 		end
-		if settings[modename][typename]["base"]:GetValue() == 2 then materialtype = "UnlitGeneric" else materialtype = "VertexLitGeneric" end
-		if settings[modename][typename]["base"]:GetValue() == 3 then
+		if settings[dmode][dtype]["base"]:GetValue() == 2 then materialtype = "UnlitGeneric" else materialtype = "VertexLitGeneric" end
+		if settings[dmode][dtype]["base"]:GetValue() == 3 then
 			a = 0
 		end
 		if selectedmode == 3 then
@@ -934,7 +934,7 @@ local function DispatchMaterial(i)
 		}]]
 		return vmt
 	elseif i == 2 then
-		local overlaytype = settings[modename][typename]["overlay"]:GetValue()
+		local overlaytype = settings[dmode][dtype]["overlay"]:GetValue()
 		local ignorez = 0
 		if selectedmode == 3 then
 			ignorez = 0
@@ -946,8 +946,8 @@ local function DispatchMaterial(i)
 			end
 		end
 		if	overlaytype == 1 or overlaytype == 3 then
-			local r, g, b, a = settings[modename][typename]["overlayclr"]:GetValue()
-			local x, y, z = settings[modename][typename]["glowx"]:GetValue(), settings[modename][typename]["glowy"]:GetValue(), settings[modename][typename]["glowz"]:GetValue()
+			local r, g, b, a = settings[dmode][dtype]["overlayclr"]:GetValue()
+			local x, y, z = settings[dmode][dtype]["glowx"]:GetValue(), settings[dmode][dtype]["glowy"]:GetValue(), settings[dmode][dtype]["glowz"]:GetValue()
 			local wireframe = 0
 			if overlaytype == 3 then wireframe = 1 else wireframe = 0 end
 			local vmt = [["VertexLitGeneric" {
@@ -962,7 +962,7 @@ local function DispatchMaterial(i)
 				}]]
 			return vmt
 		elseif overlaytype == 2 then
-			local r, g, b, a = settings[modename][typename]["overlayclr"]:GetValue()
+			local r, g, b, a = settings[dmode][dtype]["overlayclr"]:GetValue()
 			local vmt = [["UnlitGeneric" {
 				"$color" 					"[]].. r/255 .. " " .. g/255 .. " " .. b/255 ..[[]"
 				"$alpha" 					"]].. a/255 ..[["
@@ -978,9 +978,21 @@ end
 local function CheckChanges()
 
 	if menuref:IsActive() then
+		for tempmode = 0, 3 do
+			local tempmodename = nil
+			if tempmode == 0 then tempmodename = "enemy" elseif tempmode == 1 then tempmodename = "friend" elseif tempmode == 2 then tempmodename = "loc" elseif tempmode == 3 then tempmodename = "viewmodel" else tempmodename = nil end
+			for temptype = 0, 3 do
+				local temptypename = nil
+				if tempmode == 3 then
+					if temptype == 0 then temptypename = "arms" elseif temptype == 1 then temptypename = "weapon" else temptypename = nil end
+				else
+					if temptype == 0 then temptypename = "vis" elseif temptype == 1 then temptypename = "iz" elseif temptype == 2 then temptypename = "attvis" elseif temptype == 3 then temptypename = "attiz" else temptypename = nil end
+				end
 
-		local cache = cached[modename][typename]
-		local setting = settings[modename][typename]
+				if temptypename ~= nil and tempmodename ~= nil then
+
+					local cache = cached[tempmodename][temptypename]
+					local setting = settings[tempmodename][temptypename]
 
 		-- if lastadvanced ~= advancedcheck:GetValue() then
 		-- 	if advancedcheck:GetValue() then
@@ -1029,96 +1041,96 @@ local function CheckChanges()
 
 			RemoveDefaults()
 
-			if selectedmode == 0 then
-				if selectedtype == 0 then
+			if tempmode == 0 then
+				if temptype == 0 then
 					if setting.base:GetValue() == 0 then
 						EnemyVisMat = nil
 					else
-						EnemyVisMat = materials.Create("EnemyVisMat", DispatchMaterial(1))
+						EnemyVisMat = materials.Create("EnemyVisMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 1 then
+				elseif temptype == 1 then
 					if setting.base:GetValue() == 0 then
 						EnemyIzMat = nil
 					else
-						EnemyIzMat = materials.Create("EnemyIzMat", DispatchMaterial(1))
+						EnemyIzMat = materials.Create("EnemyIzMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 2 then
+				elseif temptype == 2 then
 					if setting.base:GetValue() == 0 then
 						EnemyAttVisMat = nil
 					else
-						EnemyAttVisMat = materials.Create("EnemyAttVisMat", DispatchMaterial(1))
+						EnemyAttVisMat = materials.Create("EnemyAttVisMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 3 then
+				elseif temptype == 3 then
 					if setting.base:GetValue() == 0 then
 						EnemyAttIzMat = nil
 					else
-						EnemyAttIzMat = materials.Create("EnemyAttIzMat", DispatchMaterial(1))
+						EnemyAttIzMat = materials.Create("EnemyAttIzMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
 				end
-			elseif selectedmode == 1 then
-				if selectedtype == 0 then
+			elseif tempmode == 1 then
+				if temptype == 0 then
 					if setting.base:GetValue() == 0 then
 						FriendVisMat = nil
 					else
-						FriendVisMat = materials.Create("FriendVisMat", DispatchMaterial(1))
+						FriendVisMat = materials.Create("FriendVisMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 1 then
+				elseif temptype == 1 then
 					if setting.base:GetValue() == 0 then
 						FriendIzMat = nil
 					else
-						FriendIzMat = materials.Create("FriendIzMat", DispatchMaterial(1))
+						FriendIzMat = materials.Create("FriendIzMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 2 then
+				elseif temptype == 2 then
 					if setting.base:GetValue() == 0 then
 						FriendAttVisMat = nil
 					else
-						FriendAttVisMat = materials.Create("FriendAttVisMat", DispatchMaterial(1))
+						FriendAttVisMat = materials.Create("FriendAttVisMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 3 then
+				elseif temptype == 3 then
 					if setting.base:GetValue() == 0 then
 						FriendAttIzMat = nil
 					else
-						FriendAttIzMat = materials.Create("FriendAttIzMat", DispatchMaterial(1))
+						FriendAttIzMat = materials.Create("FriendAttIzMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
 				end
-			elseif selectedmode == 2 then
-				if selectedtype == 0 then
+			elseif tempmode == 2 then
+				if temptype == 0 then
 					if setting.base:GetValue() == 0 then
 						LocalVisMat = nil
 					else
-						LocalVisMat = materials.Create("LocalVisMat", DispatchMaterial(1))
+						LocalVisMat = materials.Create("LocalVisMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 1 then
+				elseif temptype == 1 then
 					if setting.base:GetValue() == 0 then
 						LocalIzMat = nil
 					else
-						LocalIzMat = materials.Create("LocalIzMat", DispatchMaterial(1))
+						LocalIzMat = materials.Create("LocalIzMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 2 then
+				elseif temptype == 2 then
 					if setting.base:GetValue() == 0 then
 						LocalAttVisMat = nil
 					else
-						LocalAttVisMat = materials.Create("LocalAttVisMat", DispatchMaterial(1))
+						LocalAttVisMat = materials.Create("LocalAttVisMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 3 then
+				elseif temptype == 3 then
 					if setting.base:GetValue() == 0 then
 						LocalAttIzMat = nil
 					else
-						LocalAttIzMat = materials.Create("LocalAttIzMat", DispatchMaterial(1))
+						LocalAttIzMat = materials.Create("LocalAttIzMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
 				end
-			elseif selectedmode == 3 then
-				if selectedtype == 0 then
+			elseif tempmode == 3 then
+				if temptype == 0 then
 					if setting.base:GetValue() == 0 then
 						ArmsMat = nil
 					else
-						ArmsMat = materials.Create("ArmsMat", DispatchMaterial(1))
+						ArmsMat = materials.Create("ArmsMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
-				elseif selectedtype == 1 then
+				elseif temptype == 1 then
 					if setting.base:GetValue() == 0 then
 						WeaponMat = nil
 					else
-						WeaponMat = materials.Create("WeaponMat", DispatchMaterial(1))
+						WeaponMat = materials.Create("WeaponMat", DispatchMaterial(1, tempmodename, temptypename))
 					end
 				end
 			end
@@ -1153,96 +1165,96 @@ local function CheckChanges()
 
 			RemoveDefaults()
 
-			if selectedmode == 0 then
-				if selectedtype == 0 then
+			if tempmode == 0 then
+				if temptype == 0 then
 					if setting.overlay:GetValue() == 0 then
 						EnemyVisOverMat = nil
 					else
-						EnemyVisOverMat = materials.Create("EnemyVisOverMat", DispatchMaterial(2))
+						EnemyVisOverMat = materials.Create("EnemyVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 1 then
+				elseif temptype == 1 then
 					if setting.overlay:GetValue() == 0 then
 						EnemyIzOverMat = nil
 					else
-						EnemyIzOverMat = materials.Create("EnemyIzOverMat", DispatchMaterial(2))
+						EnemyIzOverMat = materials.Create("EnemyIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 2 then
+				elseif temptype == 2 then
 					if setting.overlay:GetValue() == 0 then
 						EnemyAttVisOverMat = nil
 					else
-						EnemyAttVisOverMat = materials.Create("EnemyAttVisOverMat", DispatchMaterial(2))
+						EnemyAttVisOverMat = materials.Create("EnemyAttVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 3 then
+				elseif temptype == 3 then
 					if setting.overlay:GetValue() == 0 then
 						EnemyAttIzOverMat = nil
 					else
-						EnemyAttIzOverMat = materials.Create("EnemyAttIzOverMat", DispatchMaterial(2))
+						EnemyAttIzOverMat = materials.Create("EnemyAttIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
 				end
-			elseif selectedmode == 1 then
-				if selectedtype == 0 then
+			elseif tempmode == 1 then
+				if temptype == 0 then
 					if setting.overlay:GetValue() == 0 then
 						FriendVisOverMat = nil
 					else
-						FriendVisOverMat = materials.Create("FriendVisOverMat", DispatchMaterial(2))
+						FriendVisOverMat = materials.Create("FriendVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 1 then
+				elseif temptype == 1 then
 					if setting.overlay:GetValue() == 0 then
 						FriendIzOverMat = nil
 					else
-						FriendIzOverMat = materials.Create("FriendIzOverMat", DispatchMaterial(2))
+						FriendIzOverMat = materials.Create("FriendIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 2 then
+				elseif temptype == 2 then
 					if setting.overlay:GetValue() == 0 then
 						FriendAttVisOverMat = nil
 					else
-						FriendAttVisOverMat = materials.Create("FriendAttVisOverMat", DispatchMaterial(2))
+						FriendAttVisOverMat = materials.Create("FriendAttVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 3 then
+				elseif temptype == 3 then
 					if setting.overlay:GetValue() == 0 then
 						FriendAttIzOverMat = nil
 					else
-						FriendAttIzOverMat = materials.Create("FriendAttIzOverMat", DispatchMaterial(2))
+						FriendAttIzOverMat = materials.Create("FriendAttIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
 				end
-			elseif selectedmode == 2 then
-				if selectedtype == 0 then
+			elseif tempmode == 2 then
+				if temptype == 0 then
 					if setting.overlay:GetValue() == 0 then
 						LocalVisOverMat = nil
 					else
-						LocalVisOverMat = materials.Create("LocalVisOverMat", DispatchMaterial(2))
+						LocalVisOverMat = materials.Create("LocalVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 1 then
+				elseif temptype == 1 then
 					if setting.overlay:GetValue() == 0 then
 						LocalIzOverMat = nil
 					else
-						LocalIzOverMat = materials.Create("LocalIzOverMat", DispatchMaterial(2))
+						LocalIzOverMat = materials.Create("LocalIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 2 then
+				elseif temptype == 2 then
 					if setting.overlay:GetValue() == 0 then
 						LocalAttVisOverMat = nil
 					else
-						LocalAttVisOverMat = materials.Create("LocalAttVisOverMat", DispatchMaterial(2))
+						LocalAttVisOverMat = materials.Create("LocalAttVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 3 then
+				elseif temptype == 3 then
 					if setting.overlay:GetValue() == 0 then
 						LocalAttIzOverMat = nil
 					else
-						LocalAttIzOverMat = materials.Create("LocalAttIzOverMat", DispatchMaterial(2))
+						LocalAttIzOverMat = materials.Create("LocalAttIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
 				end
-			elseif selectedmode == 3 then
-				if selectedtype == 0 then
+			elseif tempmode == 3 then
+				if temptype == 0 then
 					if setting.overlay:GetValue() == 0 then
 						ArmsOverMat = nil
 					else
-						ArmsOverMat = materials.Create("ArmsOverMat", DispatchMaterial(2))
+						ArmsOverMat = materials.Create("ArmsOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
-				elseif selectedtype == 1 then
+				elseif temptype == 1 then
 					if setting.overlay:GetValue() == 0 then
 						WeaponOverMat = nil
 					else
-						WeaponOverMat = materials.Create("WeaponOverMat", DispatchMaterial(2))
+						WeaponOverMat = materials.Create("WeaponOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
 				end
 			end
@@ -1255,6 +1267,9 @@ local function CheckChanges()
 			cache.glowx = setting.glowx:GetValue()
 			cache.glowy = setting.glowy:GetValue()
 			cache.glowz = setting.glowz:GetValue()
+		end
+		end
+		end
 		end
 	end
 end
