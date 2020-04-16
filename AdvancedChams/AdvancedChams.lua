@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "1.2"
+local VERSION_NUMBER = "1.2b"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -29,14 +29,13 @@ local function handleUpdates()
 			if fadeout > 255 then fadeout = 255 end
 		end
 		if updateframes >= 0.25 then fadein = 650 end
-
-		for i = 0, 650 do
+		for i = 0, 600 do
 			local alpha = 200-i/3 - fadeout
 			if alpha < 0 then alpha = 0 end
 			draw.Color(15,15,15,alpha)
-			draw.Line(i - 650 + fadein, 0, i - 650 + fadein, 30)
+			draw.FilledRect(i - 650 + fadein, 0, i+1 - 650 + fadein, 30)
 			draw.Color(255,75,75,alpha)
-			draw.Line(i - 650 + fadein, 30, i - 650 + fadein, 31)
+			draw.FilledRect(i - 650 + fadein, 30, i+1 - 650 + fadein, 31)
 		end
 		draw.SetFont(updaterfont1)
 		draw.Color(255,75,75,255 - fadeout)
