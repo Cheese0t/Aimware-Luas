@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "1.1"
+local VERSION_NUMBER = "1.1b"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -900,21 +900,21 @@ local function DispatchMaterial(i)
 		return vmt
 	elseif i == 2 then
 		local overlaytype = settings[modename][typename]["overlay"]:GetValue()
+		local ignorez = 0
+		if selectedmode == 3 then
+			ignorez = 0
+		else
+			if selectedtype == 1 or selectedtype == 3 then
+				ignorez = 1
+			else
+				ignorez = 0
+			end
+		end
 		if	overlaytype == 1 or overlaytype == 3 then
 			local r, g, b, a = settings[modename][typename]["overlayclr"]:GetValue()
 			local x, y, z = settings[modename][typename]["glowx"]:GetValue(), settings[modename][typename]["glowy"]:GetValue(), settings[modename][typename]["glowz"]:GetValue()
 			local wireframe = 0
-			local ignorez = 0
 			if overlaytype == 3 then wireframe = 1 else wireframe = 0 end
-			if selectedmode == 3 then
-				ignorez = 0
-			else
-				if selectedtype == 1 or selectedtype == 3 then
-					ignorez = 1
-				else
-					ignorez = 0
-				end
-			end
 			local vmt = [["VertexLitGeneric" {
 				"$additive" 				"1"
 				"$envmap" 					"models/effects/cube_white"
@@ -932,7 +932,7 @@ local function DispatchMaterial(i)
 				"$color" 					"[]].. r/255 .. " " .. g/255 .. " " .. b/255 ..[[]"
 				"$alpha" 					"]].. a/255 ..[["
 				"$wireframe"				"1"
-				"$ignorez"					"]].. selectedtype ..[["
+				"$ignorez"					"]].. ignorez ..[["
 				}]]
 			return vmt
 		end
