@@ -25,10 +25,10 @@ local function handleUpdates()
 			end
 			if fadein < 0 then fadein = 0 end
 			if fadein > 650 then fadein = 650 end
-			if updateframes > 0.25 then fadein = 650 end
 			if fadeout < 0 then fadeout = 0 end
 			if fadeout > 255 then fadeout = 255 end
 		end
+		if updateframes > 0.25 then fadein = 650 end
 
 		for i = 0, 650 do
 			local alpha = 200-i/3 - fadeout
