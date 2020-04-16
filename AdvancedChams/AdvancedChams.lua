@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "1.0"
+local VERSION_NUMBER = "1.0a"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -69,7 +69,6 @@ local function handleUpdates()
 		local version = http.Get(VERSION_FILE_ADDR)
 		version = string.gsub(version, "\n", "")
 		if (version ~= VERSION_NUMBER) then
-			print("shit")
             update_available = true
 		else 
 			up_to_date = true
@@ -101,7 +100,7 @@ local function handleUpdates()
 		local spacing = draw.GetTextSize("AdvancedChams  \\  ")
 		draw.SetFont(updaterfont2)
 		draw.Color(225,225,225,255 - fadeout)
-		draw.Text(7 + spacing, 9, "Your client is up to date. Current Version: v" .. VERSION_NUMBER)
+		draw.Text(7 + spacing, 9, "Successfully loaded latest version: v" .. VERSION_NUMBER)
 	end
 end
 
