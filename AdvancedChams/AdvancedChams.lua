@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "1.3"
+local VERSION_NUMBER = "1.3a"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -975,6 +975,43 @@ local function DispatchMaterial(i, dmode, dtype)
 	end
 end
 
+local function MenuHandler()
+
+	local cache = cached[modename][typename]
+	local setting = settings[modename][typename]
+
+	-- if lastadvanced ~= advancedcheck:GetValue() then
+	-- 	if advancedcheck:GetValue() then
+	-- 		advancedgroup:SetInvisible(0)
+	-- 	else
+	-- 		advancedgroup:SetInvisible(1)
+	-- 	end
+	-- 	lastadvanced = advancedcheck:GetValue()
+	-- end
+
+	if lastmode ~= modeswitch:GetValue() or lasttype ~= typeswitch:GetValue() or lasttypevm ~= typeswitchvm:GetValue() then
+		SetSelections()
+		HideSettings(1)
+		HideSettings(2)
+		HideSettings(3)
+		lastmode = modeswitch:GetValue()
+		lasttype = typeswitch:GetValue()
+		lasttypevm = typeswitchvm:GetValue()
+	end
+	if lastbase ~= setting.base:GetValue() then
+		SetSelections()
+		HideSettings(2)
+		lastbase = setting.base:GetValue()
+	end
+	if lastoverlay ~= setting.overlay:GetValue() then
+		SetSelections()
+		HideSettings(3)
+		lastoverlay = setting.overlay:GetValue()
+	end
+end
+
+callbacks.Register("Draw", MenuHandler)
+
 local function CheckChanges()
 
 	if menuref:IsActive() then
@@ -993,35 +1030,6 @@ local function CheckChanges()
 
 					local cache = cached[tempmodename][temptypename]
 					local setting = settings[tempmodename][temptypename]
-
-		-- if lastadvanced ~= advancedcheck:GetValue() then
-		-- 	if advancedcheck:GetValue() then
-		-- 		advancedgroup:SetInvisible(0)
-		-- 	else
-		-- 		advancedgroup:SetInvisible(1)
-		-- 	end
-		-- 	lastadvanced = advancedcheck:GetValue()
-		-- end
-
-		if lastmode ~= modeswitch:GetValue() or lasttype ~= typeswitch:GetValue() or lasttypevm ~= typeswitchvm:GetValue() then
-			SetSelections()
-			HideSettings(1)
-			HideSettings(2)
-			HideSettings(3)
-			lastmode = modeswitch:GetValue()
-			lasttype = typeswitch:GetValue()
-			lasttypevm = typeswitchvm:GetValue()
-		end
-		if lastbase ~= setting.base:GetValue() then
-			SetSelections()
-			HideSettings(2)
-			lastbase = setting.base:GetValue()
-		end
-		if lastoverlay ~= setting.overlay:GetValue() then
-			SetSelections()
-			HideSettings(3)
-			lastoverlay = setting.overlay:GetValue()
-		end
 
 		local baser, baseg, baseb, basea = setting.baseclr:GetValue()
 		local reflectr, reflectg, reflectb = setting.reflectclr:GetValue()
