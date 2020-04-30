@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "2.1"
+local VERSION_NUMBER = "2.1a"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -1380,10 +1380,10 @@ local function DispatchMaterial(i, dmode, dtype)
 		if settings[dmode][dtype]["base"]:GetValue() == 3 then
 			a = 0
 		end
-		if dmode == 3 then
+		if dmode == "viewmodel" then
 			ignorez = 0
 		else
-			if dtype == 1 or dtype == 3 then
+			if dtype == "iz" or dtype == "attiz" then
 				ignorez = 1
 			else
 				ignorez = 0
@@ -1463,10 +1463,10 @@ local function DispatchMaterial(i, dmode, dtype)
 	elseif i == 2 then
 		local overlaytype = settings[dmode][dtype]["overlay"]:GetValue()
 		local ignorez = 0
-		if dmode == 3 then
+		if dmode == "viewmodel" then
 			ignorez = 0
 		else
-			if dtype == 1 or dtype == 3 then
+			if dtype == "iz" or dtype == "attiz" then
 				ignorez = 1
 			else
 				ignorez = 0
