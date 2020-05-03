@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "2.1a"
+local VERSION_NUMBER = "2.1b"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -104,7 +104,9 @@ local typeswitchvm = gui.Combobox(group, "chans.typeswitchvm", "", "Arms", "Weap
 local advancedcheck = gui.Checkbox(group, "chams.advancedmode", "", 0)
 local text2 = gui.Text(group, "Advanced Mode")
 local advancedgroup = gui.Groupbox(ref, "", 16, 155)
-local advancedinfo = gui.Text(advancedgroup, "You can find a list of textures at: https://pastebin.com/hWnq6Yvb - Some of them may not work")
+local advancedinfo = gui.Button(advancedgroup, "Click here for a list of textures", function()
+	panorama.RunScript([[SteamOverlayAPI.OpenExternalBrowserURL("https://github.com/Cheese0t/Aimware-Luas/blob/master/AdvancedChams/Material%20list.txt")]])
+end)
 local basetext = gui.Text(advancedgroup, "Base settings")
 local bumptext = gui.Text(advancedgroup, "Bumpmap settings")
 local overlaytext = gui.Text(advancedgroup, "Overlay settings")
@@ -124,8 +126,9 @@ advancedcheck:SetPosY(-43)
 advancedgroup:SetInvisible(1)
 text2:SetPosX(480)
 text2:SetPosY(-38)
-advancedinfo:SetPosX(35)
-advancedinfo:SetPosY(270)
+advancedinfo:SetPosX(150)
+advancedinfo:SetPosY(271)
+advancedinfo:SetWidth(276)
 basetext:SetPosY(-30)
 bumptext:SetPosY(70)
 overlaytext:SetPosY(170)
@@ -1149,8 +1152,8 @@ local function HideSettings(i)
 			if overlaymode == 1 or overlaymode == 3 then
 				advancedgroup:SetPosY(416)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(779)
-					ref5:SetPosY(779)
+					ref4:SetPosY(798)
+					ref5:SetPosY(798)
 				else
 					ref4:SetPosY(416)
 					ref5:SetPosY(416)
@@ -1158,8 +1161,8 @@ local function HideSettings(i)
 			else
 				advancedgroup:SetPosY(363)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(726)
-					ref5:SetPosY(726)
+					ref4:SetPosY(745)
+					ref5:SetPosY(745)
 				else
 					ref4:SetPosY(363)
 					ref5:SetPosY(363)
@@ -1181,8 +1184,8 @@ local function HideSettings(i)
 			if overlaymode == 1 or overlaymode == 3 then
 				advancedgroup:SetPosY(261)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(624)
-					ref5:SetPosY(624)
+					ref4:SetPosY(643)
+					ref5:SetPosY(643)
 				else
 					ref4:SetPosY(261)
 					ref5:SetPosY(261)
@@ -1190,8 +1193,8 @@ local function HideSettings(i)
 			else
 				advancedgroup:SetPosY(208)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(571)
-					ref5:SetPosY(571)
+					ref4:SetPosY(590)
+					ref5:SetPosY(590)
 				else
 					ref4:SetPosY(208)
 					ref5:SetPosY(208)
@@ -1213,8 +1216,8 @@ local function HideSettings(i)
 			if overlaymode == 1 or overlaymode == 3 then
 				advancedgroup:SetPosY(208)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(571)
-					ref5:SetPosY(571)
+					ref4:SetPosY(590)
+					ref5:SetPosY(590)
 				else
 					ref4:SetPosY(208)
 					ref5:SetPosY(208)
@@ -1222,8 +1225,8 @@ local function HideSettings(i)
 			else
 				advancedgroup:SetPosY(155)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(518)
-					ref5:SetPosY(518)
+					ref4:SetPosY(537)
+					ref5:SetPosY(537)
 				else
 					ref4:SetPosY(155)
 					ref5:SetPosY(155)
@@ -1268,8 +1271,8 @@ local function HideSettings(i)
 			if basemode == 1 then
 				advancedgroup:SetPosY(416)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(779)
-					ref5:SetPosY(779)
+					ref4:SetPosY(798)
+					ref5:SetPosY(798)
 				else
 					ref4:SetPosY(416)
 					ref5:SetPosY(416)
@@ -1277,8 +1280,8 @@ local function HideSettings(i)
 			elseif basemode == 2 then
 				advancedgroup:SetPosY(261)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(624)
-					ref5:SetPosY(624)
+					ref4:SetPosY(643)
+					ref5:SetPosY(643)
 				else
 					ref4:SetPosY(261)
 					ref5:SetPosY(261)
@@ -1286,8 +1289,8 @@ local function HideSettings(i)
 			else
 				advancedgroup:SetPosY(208)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(571)
-					ref5:SetPosY(571)
+					ref4:SetPosY(590)
+					ref5:SetPosY(590)
 				else
 					ref4:SetPosY(208)
 					ref5:SetPosY(208)
@@ -1300,8 +1303,8 @@ local function HideSettings(i)
 			if basemode == 1 then
 				advancedgroup:SetPosY(363)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(726)
-					ref5:SetPosY(726)
+					ref4:SetPosY(745)
+					ref5:SetPosY(745)
 				else
 					ref4:SetPosY(363)
 					ref5:SetPosY(363)
@@ -1309,8 +1312,8 @@ local function HideSettings(i)
 			elseif basemode == 2 then
 				advancedgroup:SetPosY(208)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(571)
-					ref5:SetPosY(571)
+					ref4:SetPosY(590)
+					ref5:SetPosY(590)
 				else
 					ref4:SetPosY(208)
 					ref5:SetPosY(208)
@@ -1318,8 +1321,8 @@ local function HideSettings(i)
 			else
 				advancedgroup:SetPosY(155)
 				if advancedcheck:GetValue() then
-					ref4:SetPosY(518)
-					ref5:SetPosY(518)
+					ref4:SetPosY(537)
+					ref5:SetPosY(537)
 				else
 					ref4:SetPosY(155)
 					ref5:SetPosY(155)
