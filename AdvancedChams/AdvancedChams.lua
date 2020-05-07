@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "3.0"
+local VERSION_NUMBER = "3.1"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -147,6 +147,30 @@ advancedinfo:SetWidth(276)
 basetext:SetPosY(-30)
 bumptext:SetPosY(70)
 overlaytext:SetPosY(170)
+
+local scopeblendgroup = gui.Groupbox(ref, "", 16,150)
+local scopeblendbox = gui.Checkbox(scopeblendgroup, "chams.scopeblendbox", "", 0)
+local scopeblendtext = gui.Text(scopeblendgroup, "Enable scope blend")
+local scopeblendselector = gui.Multibox( scopeblendgroup, "Materials to blend")
+local blendmodel = gui.Checkbox(scopeblendselector, "chams.blendmodel", "Model", 0)
+local blendmodeloverlay = gui.Checkbox(scopeblendselector, "chams.blendmodeloverlay", "Model Overlay", 0)
+local blendattachment = gui.Checkbox(scopeblendselector, "chams.blendattachment", "Attachment", 0)
+local blendattachmentoverlay = gui.Checkbox(scopeblendselector, "chams.blendattachmentoverlay", "Attachment Overlay", 0)
+local blendghost = gui.Checkbox(scopeblendselector, "chams.blendghost", "Ghost", 0)
+local blendghostoverlay = gui.Checkbox(scopeblendselector, "chams.blendghostoverlay", "Ghost Overlay", 0)
+local scopeblendslider = gui.Slider(scopeblendgroup, "chams.scopeblend", "Blend amount", 100, 0, 100)
+
+scopeblendbox:SetPosX(568)
+scopeblendbox:SetPosY(-43)
+scopeblendtext:SetPosX(464)
+scopeblendtext:SetPosY(-38)
+scopeblendselector:SetWidth(264)
+scopeblendselector:SetPosY(-25)
+scopeblendslider:SetWidth(264)
+scopeblendslider:SetPosX(316)
+scopeblendslider:SetPosY(-25)
+
+local IsScoped, HeldWeapon, Modulated = nil, nil, false
 
 local EnemyVisMat, EnemyIzMat, EnemyVisOverMat, EnemyIzOverMat = nil, nil, nil, nil
 local BtVisMat, BtIzMat, BtVisOverMat, BtIzOverMat = nil, nil, nil, nil
@@ -1283,7 +1307,7 @@ local cached = {
 	}
 }
 
-local lastmode, lasttype, lastvis, lasttypevm, lasttypeenemy, lasttypelocal, lastbase, lastoverlay, lastadvanced = nil, nil, nil, nil, nil, nil, nil, nil, nil
+local lastmode, lasttype, lastvis, lasttypevm, lasttypeenemy, lasttypelocal, lastbase, lastoverlay, lastadvanced, lastblend = nil, nil, nil, nil, nil, nil, nil, nil, nil, nil
 local selectedmode, selectedtype, selectedvis, modename, typename, basemode, overlaymode = nil, nil, nil, nil, nil, nil, nil
 
 local function SetSelections()
@@ -1459,8 +1483,18 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetPosY(290)
 			if overlaymode == 1 or overlaymode == 3 then
 				advancedgroup:SetPosY(416)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(798)
+				else
+					scopeblendgroup:SetPosY(416)
+				end
 			else
 				advancedgroup:SetPosY(363)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(745)
+				else
+					scopeblendgroup:SetPosY(363)
+				end
 			end
 		elseif basemode == 2 then
 			settings[modename][typename]["reflect"]:SetInvisible(false)
@@ -1477,8 +1511,18 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetPosY(130)
 			if overlaymode == 1 or overlaymode == 3 then
 				advancedgroup:SetPosY(261)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(646)
+				else
+					scopeblendgroup:SetPosY(261)
+				end
 			else
 				advancedgroup:SetPosY(208)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(590)
+				else
+					scopeblendgroup:SetPosY(208)
+				end
 			end
 		else
 			settings[modename][typename]["reflect"]:SetInvisible(true)
@@ -1495,8 +1539,18 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetPosY(80)
 			if overlaymode == 1 or overlaymode == 3 then
 				advancedgroup:SetPosY(208)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(590)
+				else
+					scopeblendgroup:SetPosY(208)
+				end
 			else
 				advancedgroup:SetPosY(155)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(537)
+				else
+					scopeblendgroup:SetPosY(155)
+				end
 			end
 		end
 		if basemode == 0 or basemode == 3 then
@@ -1508,6 +1562,8 @@ local function HideSettings(i)
 			settings[modename][typename]["bumpmap"]:SetDisabled(true)
 			settings[modename][typename]["bumpspeed"]:SetDisabled(true)
 			settings[modename][typename]["bumpangle"]:SetDisabled(true)
+			basetext:SetDisabled(true)
+			bumptext:SetDisabled(true)
 		else
 			if basemode == 1 then
 				settings[modename][typename]["basetexturecheck"]:SetDisabled(false)
@@ -1518,6 +1574,8 @@ local function HideSettings(i)
 				settings[modename][typename]["bumpmap"]:SetDisabled(false)
 				settings[modename][typename]["bumpspeed"]:SetDisabled(false)
 				settings[modename][typename]["bumpangle"]:SetDisabled(false)
+				basetext:SetDisabled(false)
+				bumptext:SetDisabled(false)
 			else
 				settings[modename][typename]["basetexturecheck"]:SetDisabled(false)
 				settings[modename][typename]["basetexture"]:SetDisabled(false)
@@ -1527,6 +1585,8 @@ local function HideSettings(i)
 				settings[modename][typename]["bumpmap"]:SetDisabled(true)
 				settings[modename][typename]["bumpspeed"]:SetDisabled(true)
 				settings[modename][typename]["bumpangle"]:SetDisabled(true)
+				basetext:SetDisabled(false)
+				bumptext:SetDisabled(true)
 			end
 		end
 	elseif i == 3 then
@@ -1536,10 +1596,25 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetInvisible(false)
 			if basemode == 1 then
 				advancedgroup:SetPosY(416)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(798)
+				else
+					scopeblendgroup:SetPosY(416)
+				end
 			elseif basemode == 2 then
 				advancedgroup:SetPosY(261)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(643)
+				else
+					scopeblendgroup:SetPosY(261)
+				end
 			else
 				advancedgroup:SetPosY(208)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(590)
+				else
+					scopeblendgroup:SetPosY(208)
+				end
 			end
 		else
 			settings[modename][typename]["glowx"]:SetInvisible(true)
@@ -1547,10 +1622,25 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetInvisible(true)
 			if basemode == 1 then
 				advancedgroup:SetPosY(363)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(745)
+				else
+					scopeblendgroup:SetPosY(363)
+				end
 			elseif basemode == 2 then
 				advancedgroup:SetPosY(208)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(590)
+				else
+					scopeblendgroup:SetPosY(208)
+				end
 			else
 				advancedgroup:SetPosY(155)
+				if advancedcheck:GetValue() then
+					scopeblendgroup:SetPosY(537)
+				else
+					scopeblendgroup:SetPosY(155)
+				end
 			end
 		end
 		if overlaymode == 4 then
@@ -1558,11 +1648,13 @@ local function HideSettings(i)
 			settings[modename][typename]["overlayangle"]:SetDisabled(false)
 			settings[modename][typename]["overlayspeed"]:SetDisabled(false)
 			settings[modename][typename]["overlaytexture"]:SetDisabled(false)
+			overlaytext:SetDisabled(false)
 		else
 			settings[modename][typename]["overlaywireframe"]:SetDisabled(true)
 			settings[modename][typename]["overlayangle"]:SetDisabled(true)
 			settings[modename][typename]["overlayspeed"]:SetDisabled(true)
 			settings[modename][typename]["overlaytexture"]:SetDisabled(true)
+			overlaytext:SetDisabled(true)
 		end
 	end
 end
@@ -1798,6 +1890,16 @@ local function MenuHandler()
 		SetSelections()
 		HideSettings(3)
 		lastoverlay = setting.overlay:GetValue()
+	end
+	if lastblend ~= scopeblendbox:GetValue() then
+		if scopeblendbox:GetValue() then
+			scopeblendselector:SetDisabled(0)
+			scopeblendslider:SetDisabled(0)
+		else
+			scopeblendselector:SetDisabled(1)
+			scopeblendslider:SetDisabled(1)
+		end
+		lastblend = scopeblendbox:GetValue()
 	end
 end
 
@@ -2199,6 +2301,152 @@ end
 
 callbacks.Register("Draw", CheckChanges)
 
+local function DoScopeBlend()
+	local lp = entities.GetLocalPlayer()
+	if lp~= nil then
+		IsScoped = lp:GetProp("m_bIsScoped");
+		if IsScoped == 256 then IsScoped = 0 end
+		if IsScoped == 257 then IsScoped = 1 end
+
+		HeldWeapon = string.gsub(lp:GetPropEntity("m_hActiveWeapon"):GetClass(), "CWeapon", "")
+
+		local blendvalue = scopeblendslider:GetValue() / 100
+
+		if scopeblendbox:GetValue() and blendvalue ~= 1 then
+			if not Modulated and IsScoped == 1 then
+				
+				if blendmodel:GetValue() then
+					if LocalVisMat ~= nil then
+						if cached.loc.vis.base ~= 3 then
+							LocalVisMat:AlphaModulate(cached.loc.vis.baseclr.a/255 * blendvalue)
+						end
+					end
+					if LocalIzMat ~= nil then
+						if cached.loc.iz.base ~= 3 then
+							LocalIzMat:AlphaModulate(cached.loc.iz.baseclr.a/255 * blendvalue)
+						end
+					end
+				end
+
+				if blendmodeloverlay:GetValue() then
+					if LocalVisOverMat ~= nil then
+						LocalVisOverMat:AlphaModulate(cached.loc.vis.overlayclr.a/255 * blendvalue)
+					end
+					if LocalIzOverMat ~= nil then
+						LocalIzOverMat:AlphaModulate(cached.loc.iz.overlayclr.a/255 * blendvalue)
+					end
+				end
+
+				if blendattachment:GetValue() then
+					if LocalAttVisMat ~= nil then
+						if cached.loc.attvis.base ~= 3 then
+							LocalAttVisMat:AlphaModulate(cached.loc.attvis.baseclr.a/255 * blendvalue)
+						end
+					end
+					if LocalAttIzMat ~= nil then
+						if cached.loc.attiz.base ~= 3 then
+							LocalAttIzMat:AlphaModulate(cached.loc.attiz.baseclr.a/255 * blendvalue)
+						end
+					end
+				end
+
+				if blendattachmentoverlay:GetValue() then
+					if LocalAttVisOverMat ~= nil then
+						LocalAttVisOverMat:AlphaModulate(cached.loc.attvis.overlayclr.a/255 * blendvalue)
+					end
+					if LocalAttIzOverMat ~= nil then
+						LocalAttIzOverMat:AlphaModulate(cached.loc.attiz.overlayclr.a/255 * blendvalue)
+					end
+				end
+
+				if blendghost:GetValue() then
+					if GhostVisMat ~= nil then
+						if cached.loc.ghostvis.base ~= 3 then
+							GhostVisMat:AlphaModulate(cached.loc.ghostvis.baseclr.a/255 * blendvalue)
+						end
+					end
+					if GhostIzMat ~= nil then
+						if cached.loc.vis.base ~= 3 then
+							GhostIzMat:AlphaModulate(cached.loc.ghostiz.baseclr.a/255 * blendvalue)
+						end
+					end
+				end
+
+				if blendghostoverlay:GetValue() then
+					if GhostVisOverMat ~= nil then
+						GhostVisOverMat:AlphaModulate(cached.loc.ghostvis.overlayclr.a/255 * blendvalue)
+					end
+					if GhostIzOverMat ~= nil then
+						GhostIzOverMat:AlphaModulate(cached.loc.ghostiz.overlayclr.a/255 * blendvalue)
+					end
+				end
+
+				Modulated = true
+			end
+		end
+		if Modulated and IsScoped ~= 1 then
+
+			if LocalVisMat ~= nil then
+				if cached.loc.vis.base ~= 3 then
+					LocalVisMat:AlphaModulate(cached.loc.vis.baseclr.a/255)
+				end
+			end
+			if LocalIzMat ~= nil then
+				if cached.loc.iz.base ~= 3 then
+					LocalIzMat:AlphaModulate(cached.loc.iz.baseclr.a/255)
+				end
+			end
+
+			if LocalVisOverMat ~= nil then
+				LocalVisOverMat:AlphaModulate(cached.loc.vis.overlayclr.a/255)
+			end
+			if LocalIzOverMat ~= nil then
+				LocalIzOverMat:AlphaModulate(cached.loc.iz.overlayclr.a/255)
+			end
+
+			if LocalAttVisMat ~= nil then
+				if cached.loc.attvis.base ~= 3 then
+					LocalAttVisMat:AlphaModulate(cached.loc.attvis.baseclr.a/255)
+				end
+			end
+			if LocalAttIzMat ~= nil then
+				if cached.loc.attiz.base ~= 3 then
+					LocalAttIzMat:AlphaModulate(cached.loc.attiz.baseclr.a/255)
+				end
+			end
+
+			if LocalAttVisOverMat ~= nil then
+				LocalAttVisOverMat:AlphaModulate(cached.loc.attvis.overlayclr.a/255)
+			end
+			if LocalAttIzOverMat ~= nil then
+				LocalAttIzOverMat:AlphaModulate(cached.loc.attiz.overlayclr.a/255)
+			end
+
+			if GhostVisMat ~= nil then
+				if cached.loc.ghostvis.base ~= 3 then
+					GhostVisMat:AlphaModulate(cached.loc.ghostvis.baseclr.a/255)
+				end
+			end
+			if GhostIzMat ~= nil then
+				if cached.loc.vis.base ~= 3 then
+					GhostIzMat:AlphaModulate(cached.loc.ghostiz.baseclr.a/255)
+				end
+			end
+
+			if GhostVisOverMat ~= nil then
+				GhostVisOverMat:AlphaModulate(cached.loc.ghostvis.overlayclr.a/255)
+			end
+			if GhostIzOverMat ~= nil then
+				GhostIzOverMat:AlphaModulate(cached.loc.ghostiz.overlayclr.a/255)
+			end
+
+			Modulated = false
+		end
+	end
+end
+
+callbacks.Register("Draw", DoScopeBlend)
+
 local function ApplyChams(Model)
 	local ent = Model:GetEntity()
 	local lp = entities.GetLocalPlayer()
@@ -2215,12 +2463,24 @@ local function ApplyChams(Model)
 				end
 			end
 			if class == "CPredictedViewModel" then
-				if WeaponMat ~= nil then
-					Model:ForcedMaterialOverride(WeaponMat)
-				end
-				if WeaponOverMat ~= nil then
-					Model:DrawExtraPass()
-					Model:ForcedMaterialOverride(WeaponOverMat)
+				if IsScoped == 1 then
+					if HeldWeapon ~= "Aug" and HeldWeapon ~= "SG556" then
+						if WeaponMat ~= nil then
+							Model:ForcedMaterialOverride(WeaponMat)
+						end
+						if WeaponOverMat ~= nil then
+							Model:DrawExtraPass()
+							Model:ForcedMaterialOverride(WeaponOverMat)
+						end
+					end
+				else
+					if WeaponMat ~= nil then
+						Model:ForcedMaterialOverride(WeaponMat)
+					end
+					if WeaponOverMat ~= nil then
+						Model:DrawExtraPass()
+						Model:ForcedMaterialOverride(WeaponOverMat)
+					end
 				end
 			end
 		end
