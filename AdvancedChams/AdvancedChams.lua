@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "2.1b"
+local VERSION_NUMBER = "3.0"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -93,14 +93,17 @@ local menuref = gui.Reference("MENU")
 ref1:SetInvisible(1)
 ref2:SetInvisible(1)
 ref3:SetInvisible(1)
-ref4:SetPosY(155)
-ref5:SetPosY(155)
+ref4:SetInvisible(1)
+ref5:SetInvisible(1)
 ref6:SetInvisible(1)
 local group = gui.Groupbox(ref, "", 16,16)
 local text1 = gui.Text(group, "Main selection")
 local modeswitch = gui.Combobox(group, "chams.modeswitch", "", "Enemy", "Friendly", "Local", "Viewmodel")
-local typeswitch = gui.Combobox(group, "chams.typeswitch", "", "Visible", "Invisible", "Visible Attachment", "Invisible Attachment")
-local typeswitchvm = gui.Combobox(group, "chans.typeswitchvm", "", "Arms", "Weapon")
+local typeswitchenemy = gui.Combobox(group, "chams.typeswitchenemy", "", "Model", "Attachment", "Backtrack")
+local typeswitchlocal = gui.Combobox(group, "chams.typeswitchlocal", "", "Model", "Attachment", "Ghost")
+local typeswitch = gui.Combobox(group, "chams.typeswitch", "", "Model", "Attachment")
+local typeswitchvm = gui.Combobox(group, "chams.typeswitchvm", "", "Arms", "Weapon")
+local visswitch = gui.Combobox(group, "chams.visswitch", "", "Visible", "Invisible")
 local advancedcheck = gui.Checkbox(group, "chams.advancedmode", "", 0)
 local text2 = gui.Text(group, "Advanced Mode")
 local advancedgroup = gui.Groupbox(ref, "", 16, 155)
@@ -117,10 +120,22 @@ modeswitch:SetPosY(-50)
 typeswitch:SetWidth(125)
 typeswitch:SetPosX(235)
 typeswitch:SetPosY(-50)
+typeswitch:SetInvisible(1)
+typeswitchenemy:SetWidth(125)
+typeswitchenemy:SetPosX(235)
+typeswitchenemy:SetPosY(-50)
+typeswitchlocal:SetWidth(125)
+typeswitchlocal:SetPosX(235)
+typeswitchlocal:SetPosY(-50)
+typeswitchlocal:SetInvisible(1)
+typeswitchvm:SetInvisible(1)
 typeswitchvm:SetWidth(125)
 typeswitchvm:SetPosX(235)
 typeswitchvm:SetPosY(-50)
 typeswitchvm:SetInvisible(1)
+visswitch:SetWidth(75)
+visswitch:SetPosX(370)
+visswitch:SetPosY(-50)
 advancedcheck:SetPosX(568)
 advancedcheck:SetPosY(-43)
 advancedgroup:SetInvisible(1)
@@ -134,8 +149,10 @@ bumptext:SetPosY(70)
 overlaytext:SetPosY(170)
 
 local EnemyVisMat, EnemyIzMat, EnemyVisOverMat, EnemyIzOverMat = nil, nil, nil, nil
+local BtVisMat, BtIzMat, BtVisOverMat, BtIzOverMat = nil, nil, nil, nil
 local FriendVisMat, FriendIzMat, FriendVisOverMat, FriendIzOverMat = nil, nil, nil, nil
 local LocalVisMat, LocalIzMat, LocalVisOverMat, LocalIzOverMat = nil, nil, nil, nil
+local GhostVisMat, GhostIzMat, GhostVisOverMat, GhostIzOverMat = nil, nil, nil, nil
 local EnemyAttVisMat, EnemyAttIzMat, EnemyAttVisOverMat, EnemyAttIzOverMat = nil, nil, nil, nil
 local FriendAttVisMat, FriendAttIzMat, FriendAttVisOverMat, FriendAttIzOverMat = nil, nil, nil, nil
 local LocalAttVisMat, LocalAttIzMat, LocalAttVisOverMat, LocalAttIzOverMat = nil, nil, nil, nil
@@ -154,6 +171,12 @@ local function RemoveDefaults()
 	gui.SetValue("esp.chams.weapon.occluded", 0)
 	gui.SetValue("esp.chams.weapon.visible", 0)
 	gui.SetValue("esp.chams.weapon.overlay", 0)
+	gui.SetValue("esp.chams.backtrack.occluded", 0)
+	gui.SetValue("esp.chams.backtrack.visible", 0)
+	gui.SetValue("esp.chams.backtrack.overlay", 0)
+	gui.SetValue("esp.chams.ghost.occluded", 0)
+	gui.SetValue("esp.chams.ghost.visible", 0)
+	gui.SetValue("esp.chams.ghost.overlay", 0)
 end
 
 RemoveDefaults()
@@ -279,7 +302,67 @@ local settings = {
 			overlayspeed = gui.Slider(advancedgroup, "enemy.attiz.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "enemy.attiz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
 			overlaytexture = gui.Editbox(advancedgroup, "enemy.attiz.overlaytexture", " ")
-   		}
+		},
+		btvis = {
+			base = gui.Combobox(group, "enemy.btvis.base", "Base", "Off", "Color", "Flat", "Invisible"),
+			baseclr = gui.ColorPicker(group, "enemy.btvis.base.clr", "", 255, 0, 0, 255 ),
+			overlay = gui.Combobox(group, "enemy.btvis.overlay", "Overlay", "Off", "Glow", "Wireframe", "Wireframe glow", "Custom"),
+			overlayclr = gui.ColorPicker(group, "enemy.btvis.overlay.clr", "", 255, 255, 255, 255 ),
+			reflect = gui.Slider(group, "enemy.btvis.reflect", "Reflectivity", 0, 0, 5, 0.01 ),
+			reflectboost = gui.Checkbox(group, "enemy.btvis.reflectboost", "Boost", 0),
+			reflectclr = gui.ColorPicker(group, "enemy.btvis.reflect.clr", "", 255, 255, 255, 255 ),
+			shine = gui.Slider(group, "enemy.btvis.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "enemy.btvis.shineclr", "", 255, 255, 255, 255 ),
+			shineboost = gui.Checkbox(group, "enemy.btvis.shineboost", "Boost", 0),
+			rim = gui.Slider(group, "enemy.btvis.rim", "Rimlight", 0, 0, 10, 0.01 ),
+			rimboost = gui.Checkbox(group, "enemy.btvis.rimboost", "Boost", 0),
+			pearl = gui.Slider(group, "enemy.btvis.pearl", "Pearlescent", 0, -15, 15, 0.01 ),
+			glowx = gui.Slider(group, "enemy.btvis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
+			glowy = gui.Slider(group, "enemy.btvis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
+			glowz = gui.Slider(group, "enemy.btvis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
+			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.btvis.basetexturecheck", "Custom Texture", 0),
+			basespeed = gui.Slider(advancedgroup, "enemy.btvis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			baseangle = gui.Slider(advancedgroup, "enemy.btvis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
+			basetexture = gui.Editbox(advancedgroup, "enemy.btvis.basetexture", " "),
+			bumpcheck = gui.Checkbox(advancedgroup, "enemy.btvis.bumpcheck", "Enable", 0),
+			bumpspeed = gui.Slider(advancedgroup, "enemy.btvis.bumpspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			bumpangle = gui.Slider(advancedgroup, "enemy.btvis.bumpangle", "Animation Angle", 90, -180, 180, 1 ),
+			bumpmap = gui.Editbox(advancedgroup, "enemy.btvis.bumpmap", " "),
+			overlaywireframe = gui.Checkbox(advancedgroup, "enemy.btvis.overlaywireframe", "Wireframe", 0),
+			overlayspeed = gui.Slider(advancedgroup, "enemy.btvis.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			overlayangle = gui.Slider(advancedgroup, "enemy.btvis.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
+			overlaytexture = gui.Editbox(advancedgroup, "enemy.btvis.overlaytexture", " ")
+		},
+		btiz = {
+			base = gui.Combobox(group, "enemy.btiz.base", "Base", "Off", "Color", "Flat", "Invisible"),
+			baseclr = gui.ColorPicker(group, "enemy.btiz.base.clr", "", 255, 0, 0, 255 ),
+			overlay = gui.Combobox(group, "enemy.btiz.overlay", "Overlay", "Off", "Glow", "Wireframe", "Wireframe glow", "Custom"),
+			overlayclr = gui.ColorPicker(group, "enemy.btiz.overlay.clr", "", 255, 255, 255, 255 ),
+			reflect = gui.Slider(group, "enemy.btiz.reflect", "Reflectivity", 0, 0, 5, 0.01 ),
+			reflectboost = gui.Checkbox(group, "enemy.btiz.reflectboost", "Boost", 0),
+			reflectclr = gui.ColorPicker(group, "enemy.btiz.reflect.clr", "", 255, 255, 255, 255 ),
+			shine = gui.Slider(group, "enemy.btiz.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "enemy.btiz.shineclr", "", 255, 255, 255, 255 ),
+			shineboost = gui.Checkbox(group, "enemy.btiz.shineboost", "Boost", 0),
+			rim = gui.Slider(group, "enemy.btiz.rim", "Rimlight", 0, 0, 10, 0.01 ),
+			rimboost = gui.Checkbox(group, "enemy.btiz.rimboost", "Boost", 0),
+			pearl = gui.Slider(group, "enemy.btiz.pearl", "Pearlescent", 0, -15, 15, 0.01 ),
+			glowx = gui.Slider(group, "enemy.btiz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
+			glowy = gui.Slider(group, "enemy.btiz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
+			glowz = gui.Slider(group, "enemy.btiz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
+			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.btiz.basetexturecheck", "Custom Texture", 0),
+			basespeed = gui.Slider(advancedgroup, "enemy.btiz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			baseangle = gui.Slider(advancedgroup, "enemy.btiz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
+			basetexture = gui.Editbox(advancedgroup, "enemy.btiz.basetexture", " "),
+			bumpcheck = gui.Checkbox(advancedgroup, "enemy.btiz.bumpcheck", "Enable", 0),
+			bumpspeed = gui.Slider(advancedgroup, "enemy.btiz.bumpspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			bumpangle = gui.Slider(advancedgroup, "enemy.btiz.bumpangle", "Animation Angle", 90, -180, 180, 1 ),
+			bumpmap = gui.Editbox(advancedgroup, "enemy.btiz.bumpmap", " "),
+			overlaywireframe = gui.Checkbox(advancedgroup, "enemy.btiz.overlaywireframe", "Wireframe", 0),
+			overlayspeed = gui.Slider(advancedgroup, "enemy.btiz.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			overlayangle = gui.Slider(advancedgroup, "enemy.btiz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
+			overlaytexture = gui.Editbox(advancedgroup, "enemy.btiz.overlaytexture", " ")
+  		}
    	},
    friend = {
 	   	vis = {
@@ -523,7 +606,67 @@ local settings = {
 			overlayspeed = gui.Slider(advancedgroup, "loc.attiz.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "loc.attiz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
 			overlaytexture = gui.Editbox(advancedgroup, "loc.attiz.overlaytexture", " ")
-		}
+		},
+		ghostvis = {
+			base = gui.Combobox(group, "loc.ghostvis.base", "Base", "Off", "Color", "Flat", "Invisible"),
+			baseclr = gui.ColorPicker(group, "loc.ghostvis.base.clr", "", 255, 0, 0, 255 ),
+			overlay = gui.Combobox(group, "loc.ghostvis.overlay", "Overlay", "Off", "Glow", "Wireframe", "Wireframe glow", "Custom"),
+			overlayclr = gui.ColorPicker(group, "loc.ghostvis.overlay.clr", "", 255, 255, 255, 255 ),
+			reflect = gui.Slider(group, "loc.ghostvis.reflect", "Reflectivity", 0, 0, 5, 0.01 ),
+			reflectboost = gui.Checkbox(group, "loc.ghostvis.reflectboost", "Boost", 0),
+			reflectclr = gui.ColorPicker(group, "loc.ghostvis.reflect.clr", "", 255, 255, 255, 255 ),
+			shine = gui.Slider(group, "loc.ghostvis.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "loc.ghostvis.shineclr", "", 255, 255, 255, 255 ),
+			shineboost = gui.Checkbox(group, "loc.ghostvis.shineboost", "Boost", 0),
+			rim = gui.Slider(group, "loc.ghostvis.rim", "Rimlight", 0, 0, 10, 0.01 ),
+			rimboost = gui.Checkbox(group, "loc.ghostvis.rimboost", "Boost", 0),
+			pearl = gui.Slider(group, "loc.ghostvis.pearl", "Pearlescent", 0, -15, 15, 0.01 ),
+			glowx = gui.Slider(group, "loc.ghostvis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
+			glowy = gui.Slider(group, "loc.ghostvis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
+			glowz = gui.Slider(group, "loc.ghostvis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
+			basetexturecheck = gui.Checkbox(advancedgroup, "loc.ghostvis.basetexturecheck", "Custom Texture", 0),
+			basespeed = gui.Slider(advancedgroup, "loc.ghostvis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			baseangle = gui.Slider(advancedgroup, "loc.ghostvis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
+			basetexture = gui.Editbox(advancedgroup, "loc.ghostvis.basetexture", " "),
+			bumpcheck = gui.Checkbox(advancedgroup, "loc.ghostvis.bumpcheck", "Enable", 0),
+			bumpspeed = gui.Slider(advancedgroup, "loc.ghostvis.bumpspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			bumpangle = gui.Slider(advancedgroup, "loc.ghostvis.bumpangle", "Animation Angle", 90, -180, 180, 1 ),
+			bumpmap = gui.Editbox(advancedgroup, "loc.ghostvis.bumpmap", " "),
+			overlaywireframe = gui.Checkbox(advancedgroup, "loc.ghostvis.overlaywireframe", "Wireframe", 0),
+			overlayspeed = gui.Slider(advancedgroup, "loc.ghostvis.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			overlayangle = gui.Slider(advancedgroup, "loc.ghostvis.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
+			overlaytexture = gui.Editbox(advancedgroup, "loc.ghostvis.overlaytexture", " ")
+	   	},
+		ghostiz = {
+			base = gui.Combobox(group, "loc.ghostiz.base", "Base", "Off", "Color", "Flat", "Invisible"),
+			baseclr = gui.ColorPicker(group, "loc.ghostiz.base.clr", "", 255, 0, 0, 255 ),
+			overlay = gui.Combobox(group, "loc.ghostiz.overlay", "Overlay", "Off", "Glow", "Wireframe", "Wireframe glow", "Custom"),
+			overlayclr = gui.ColorPicker(group, "loc.ghostiz.overlay.clr", "", 255, 255, 255, 255 ),
+			reflect = gui.Slider(group, "loc.ghostiz.reflect", "Reflectivity", 0, 0, 5, 0.01 ),
+			reflectboost = gui.Checkbox(group, "loc.ghostiz.reflectboost", "Boost", 0),
+			reflectclr = gui.ColorPicker(group, "loc.ghostiz.reflect.clr", "", 255, 255, 255, 255 ),
+			shine = gui.Slider(group, "loc.ghostiz.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "loc.ghostiz.shineclr", "", 255, 255, 255, 255 ),
+			shineboost = gui.Checkbox(group, "loc.ghostiz.shineboost", "Boost", 0),
+			rim = gui.Slider(group, "loc.ghostiz.rim", "Rimlight", 0, 0, 10, 0.01 ),
+			rimboost = gui.Checkbox(group, "loc.ghostiz.rimboost", "Boost", 0),
+			pearl = gui.Slider(group, "loc.ghostiz.pearl", "Pearlescent", 0, -15, 15, 0.01 ),
+			glowx = gui.Slider(group, "loc.ghostiz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
+			glowy = gui.Slider(group, "loc.ghostiz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
+			glowz = gui.Slider(group, "loc.ghostiz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
+			basetexturecheck = gui.Checkbox(advancedgroup, "loc.ghostiz.basetexturecheck", "Custom Texture", 0),
+			basespeed = gui.Slider(advancedgroup, "loc.ghostiz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			baseangle = gui.Slider(advancedgroup, "loc.ghostiz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
+			basetexture = gui.Editbox(advancedgroup, "loc.ghostiz.basetexture", " "),
+			bumpcheck = gui.Checkbox(advancedgroup, "loc.ghostiz.bumpcheck", "Enable", 0),
+			bumpspeed = gui.Slider(advancedgroup, "loc.ghostiz.bumpspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			bumpangle = gui.Slider(advancedgroup, "loc.ghostiz.bumpangle", "Animation Angle", 90, -180, 180, 1 ),
+			bumpmap = gui.Editbox(advancedgroup, "loc.ghostiz.bumpmap", " "),
+			overlaywireframe = gui.Checkbox(advancedgroup, "loc.ghostiz.overlaywireframe", "Wireframe", 0),
+			overlayspeed = gui.Slider(advancedgroup, "loc.ghostiz.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			overlayangle = gui.Slider(advancedgroup, "loc.ghostiz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
+			overlaytexture = gui.Editbox(advancedgroup, "loc.ghostiz.overlaytexture", " ")
+	   	}
 	},
 	viewmodel = {
 		arms = {
@@ -710,7 +853,67 @@ local cached = {
 			overlayspeed = nil,
 			overlayangle = nil,
 			overlaytexture = nil
-   		}
+		},
+		btvis = {
+			base = nil,
+			baseclr = {r = nil, g = nil, b = nil, a = nil},
+			overlay = nil,
+			overlayclr = {r = nil, g = nil, b = nil, a = nil},
+			reflect = nil,
+			reflectboost = nil,
+			reflectclr = {r = nil, g = nil, b = nil},
+			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
+			shineboost = nil,
+			rim = nil,
+			rimboost = nil,
+			pearl = nil,
+			glowx = nil,
+			glowy = nil,
+			glowz = nil,
+			basetexturecheck = nil,
+			basespeed = nil,
+			baseangle = nil,
+			basetexture = nil,
+			bumpcheck = nil,
+			bumpspeed = nil,
+			bumpangle = nil,
+			bumpmap = nil,
+			overlaywireframe = nil,
+			overlayspeed = nil,
+			overlayangle = nil,
+			overlaytexture = nil
+		},
+	   	btiz = {
+			base = nil,
+			baseclr = {r = nil, g = nil, b = nil, a = nil},
+			overlay = nil,
+			overlayclr = {r = nil, g = nil, b = nil, a = nil},
+			reflect = nil,
+			reflectboost = nil,
+			reflectclr = {r = nil, g = nil, b = nil},
+			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
+			shineboost = nil,
+			rim = nil,
+			rimboost = nil,
+			pearl = nil,
+			glowx = nil,
+			glowy = nil,
+			glowz = nil,
+			basetexturecheck = nil,
+			basespeed = nil,
+			baseangle = nil,
+			basetexture = nil,
+			bumpcheck = nil,
+			bumpspeed = nil,
+			bumpangle = nil,
+			bumpmap = nil,
+			overlaywireframe = nil,
+			overlayspeed = nil,
+			overlayangle = nil,
+			overlaytexture = nil
+   		}  
    	},
    	friend = {
 	   	vis = {
@@ -954,7 +1157,67 @@ local cached = {
 			overlayspeed = nil,
 			overlayangle = nil,
 			overlaytexture = nil
-   		}
+		},
+		ghostvis = {
+			base = nil,
+			baseclr = {r = nil, g = nil, b = nil, a = nil},
+			overlay = nil,
+			overlayclr = {r = nil, g = nil, b = nil, a = nil},
+			reflect = nil,
+			reflectboost = nil,
+			reflectclr = {r = nil, g = nil, b = nil},
+			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
+			shineboost = nil,
+			rim = nil,
+			rimboost = nil,
+			pearl = nil,
+			glowx = nil,
+			glowy = nil,
+			glowz = nil,
+			basetexturecheck = nil,
+			basespeed = nil,
+			baseangle = nil,
+			basetexture = nil,
+			bumpcheck = nil,
+			bumpspeed = nil,
+			bumpangle = nil,
+			bumpmap = nil,
+			overlaywireframe = nil,
+			overlayspeed = nil,
+			overlayangle = nil,
+			overlaytexture = nil
+	   	},
+	   	ghostiz = {
+			base = nil,
+			baseclr = {r = nil, g = nil, b = nil, a = nil},
+			overlay = nil,
+			overlayclr = {r = nil, g = nil, b = nil, a = nil},
+			reflect = nil,
+			reflectboost = nil,
+			reflectclr = {r = nil, g = nil, b = nil},
+			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
+			shineboost = nil,
+			rim = nil,
+			rimboost = nil,
+			pearl = nil,
+			glowx = nil,
+			glowy = nil,
+			glowz = nil,
+			basetexturecheck = nil,
+			basespeed = nil,
+			baseangle = nil,
+			basetexture = nil,
+			bumpcheck = nil,
+			bumpspeed = nil,
+			bumpangle = nil,
+			bumpmap = nil,
+			overlaywireframe = nil,
+			overlayspeed = nil,
+			overlayangle = nil,
+			overlaytexture = nil
+		}
 	},
 	viewmodel = {
 		arms = {
@@ -1020,21 +1283,48 @@ local cached = {
 	}
 }
 
-local lastmode, lasttype, lasttypevm, lastbase, lastoverlay, lastadvanced = nil, nil, nil, nil, nil, nil
-local selectedmode, selectedtype, modename, typename, basemode, overlaymode = nil, nil, nil, nil, nil, nil
+local lastmode, lasttype, lastvis, lasttypevm, lasttypeenemy, lasttypelocal, lastbase, lastoverlay, lastadvanced = nil, nil, nil, nil, nil, nil, nil, nil, nil
+local selectedmode, selectedtype, selectedvis, modename, typename, basemode, overlaymode = nil, nil, nil, nil, nil, nil, nil
 
 local function SetSelections()
 	selectedmode = modeswitch:GetValue()
+	selectedvis = visswitch:GetValue()
 	if selectedmode == 3 then
 		selectedtype = typeswitchvm:GetValue()
+	elseif selectedmode == 0 then
+		selectedtype = typeswitchenemy:GetValue()
+	elseif selectedmode == 2 then
+		selectedtype = typeswitchlocal:GetValue()
 	else
 		selectedtype = typeswitch:GetValue()
 	end
 	if selectedmode == 0 then modename = "enemy" elseif selectedmode == 1 then modename = "friend" elseif selectedmode == 2 then modename = "loc" elseif selectedmode == 3 then modename = "viewmodel" else modename = nil end
 	if selectedmode == 3 then
 		if selectedtype == 0 then typename = "arms" elseif selectedtype == 1 then typename = "weapon" else typename = nil end
+	elseif selectedmode == 0 then
+		if selectedvis == 0 then
+			if selectedtype == 0 then typename = "vis" elseif selectedtype == 1 then typename = "attvis" elseif selectedtype == 2 then typename = "btvis" else typename = nil end
+		elseif selectedvis == 1 then
+			if selectedtype == 0 then typename = "iz" elseif selectedtype == 1 then typename = "attiz"  elseif selectedtype == 2 then typename = "btiz" else typename = nil end
+		else
+			typename = nil
+		end
+	elseif selectedmode == 2 then
+		if selectedvis == 0 then
+			if selectedtype == 0 then typename = "vis" elseif selectedtype == 1 then typename = "attvis" elseif selectedtype == 2 then typename = "ghostvis" else typename = nil end
+		elseif selectedvis == 1 then
+			if selectedtype == 0 then typename = "iz" elseif selectedtype == 1 then typename = "attiz"  elseif selectedtype == 2 then typename = "ghostiz" else typename = nil end
+		else
+			typename = nil
+		end
 	else
-		if selectedtype == 0 then typename = "vis" elseif selectedtype == 1 then typename = "iz" elseif selectedtype == 2 then typename = "attvis" elseif selectedtype == 3 then typename = "attiz" else typename = nil end
+		if selectedvis == 0 then
+			if selectedtype == 0 then typename = "vis" elseif selectedtype == 1 then typename = "attvis" else typename = nil end
+		elseif selectedvis == 1 then
+			if selectedtype == 0 then typename = "iz" elseif selectedtype == 1 then typename = "attiz" else typename = nil end
+		else
+			typename = nil
+		end
 	end
 	basemode, overlaymode = settings[modename][typename]["base"]:GetValue(), settings[modename][typename]["overlay"]:GetValue()
 end
@@ -1119,9 +1409,27 @@ local function HideSettings(i)
 	if selectedmode == 3 then
 		typeswitchvm:SetInvisible(0)
 		typeswitch:SetInvisible(1)
+		typeswitchenemy:SetInvisible(1)
+		typeswitchlocal:SetInvisible(1)
+		visswitch:SetInvisible(1)
+	elseif selectedmode == 0 then
+		typeswitchvm:SetInvisible(1)
+		typeswitch:SetInvisible(1)
+		typeswitchenemy:SetInvisible(0)
+		typeswitchlocal:SetInvisible(1)
+		visswitch:SetInvisible(0)
+	elseif selectedmode == 2 then
+		typeswitchvm:SetInvisible(1)
+		typeswitch:SetInvisible(1)
+		typeswitchenemy:SetInvisible(1)
+		typeswitchlocal:SetInvisible(0)
+		visswitch:SetInvisible(0)
 	else
 		typeswitchvm:SetInvisible(1)
 		typeswitch:SetInvisible(0)
+		typeswitchenemy:SetInvisible(1)
+		typeswitchlocal:SetInvisible(1)
+		visswitch:SetInvisible(0)
 	end
 	if i == 1 then
 		for mode, types in pairs(settings) do
@@ -1151,22 +1459,8 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetPosY(290)
 			if overlaymode == 1 or overlaymode == 3 then
 				advancedgroup:SetPosY(416)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(798)
-					ref5:SetPosY(798)
-				else
-					ref4:SetPosY(416)
-					ref5:SetPosY(416)
-				end
 			else
 				advancedgroup:SetPosY(363)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(745)
-					ref5:SetPosY(745)
-				else
-					ref4:SetPosY(363)
-					ref5:SetPosY(363)
-				end
 			end
 		elseif basemode == 2 then
 			settings[modename][typename]["reflect"]:SetInvisible(false)
@@ -1183,22 +1477,8 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetPosY(130)
 			if overlaymode == 1 or overlaymode == 3 then
 				advancedgroup:SetPosY(261)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(643)
-					ref5:SetPosY(643)
-				else
-					ref4:SetPosY(261)
-					ref5:SetPosY(261)
-				end
 			else
 				advancedgroup:SetPosY(208)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(590)
-					ref5:SetPosY(590)
-				else
-					ref4:SetPosY(208)
-					ref5:SetPosY(208)
-				end
 			end
 		else
 			settings[modename][typename]["reflect"]:SetInvisible(true)
@@ -1215,22 +1495,8 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetPosY(80)
 			if overlaymode == 1 or overlaymode == 3 then
 				advancedgroup:SetPosY(208)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(590)
-					ref5:SetPosY(590)
-				else
-					ref4:SetPosY(208)
-					ref5:SetPosY(208)
-				end
 			else
 				advancedgroup:SetPosY(155)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(537)
-					ref5:SetPosY(537)
-				else
-					ref4:SetPosY(155)
-					ref5:SetPosY(155)
-				end
 			end
 		end
 		if basemode == 0 or basemode == 3 then
@@ -1270,31 +1536,10 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetInvisible(false)
 			if basemode == 1 then
 				advancedgroup:SetPosY(416)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(798)
-					ref5:SetPosY(798)
-				else
-					ref4:SetPosY(416)
-					ref5:SetPosY(416)
-				end
 			elseif basemode == 2 then
 				advancedgroup:SetPosY(261)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(643)
-					ref5:SetPosY(643)
-				else
-					ref4:SetPosY(261)
-					ref5:SetPosY(261)
-				end
 			else
 				advancedgroup:SetPosY(208)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(590)
-					ref5:SetPosY(590)
-				else
-					ref4:SetPosY(208)
-					ref5:SetPosY(208)
-				end
 			end
 		else
 			settings[modename][typename]["glowx"]:SetInvisible(true)
@@ -1302,31 +1547,10 @@ local function HideSettings(i)
 			settings[modename][typename]["glowz"]:SetInvisible(true)
 			if basemode == 1 then
 				advancedgroup:SetPosY(363)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(745)
-					ref5:SetPosY(745)
-				else
-					ref4:SetPosY(363)
-					ref5:SetPosY(363)
-				end
 			elseif basemode == 2 then
 				advancedgroup:SetPosY(208)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(590)
-					ref5:SetPosY(590)
-				else
-					ref4:SetPosY(208)
-					ref5:SetPosY(208)
-				end
 			else
 				advancedgroup:SetPosY(155)
-				if advancedcheck:GetValue() then
-					ref4:SetPosY(537)
-					ref5:SetPosY(537)
-				else
-					ref4:SetPosY(155)
-					ref5:SetPosY(155)
-				end
 			end
 		end
 		if overlaymode == 4 then
@@ -1386,7 +1610,7 @@ local function DispatchMaterial(i, dmode, dtype)
 		if dmode == "viewmodel" then
 			ignorez = 0
 		else
-			if dtype == "iz" or dtype == "attiz" then
+			if dtype == "iz" or dtype == "attiz" or dtype == "btiz" or dtype == "ghostiz" then
 				ignorez = 1
 			else
 				ignorez = 0
@@ -1469,7 +1693,7 @@ local function DispatchMaterial(i, dmode, dtype)
 		if dmode == "viewmodel" then
 			ignorez = 0
 		else
-			if dtype == "iz" or dtype == "attiz" then
+			if dtype == "iz" or dtype == "attiz" or dtype == "btiz" or dtype == "ghostiz" then
 				ignorez = 1
 			else
 				ignorez = 0
@@ -1553,7 +1777,7 @@ local function MenuHandler()
 		lastadvanced = advancedcheck:GetValue()
 	end
 
-	if lastmode ~= modeswitch:GetValue() or lasttype ~= typeswitch:GetValue() or lasttypevm ~= typeswitchvm:GetValue() then
+	if lastmode ~= modeswitch:GetValue() or lasttype ~= typeswitch:GetValue() or lasttypevm ~= typeswitchvm:GetValue() or lasttypeenemy ~= typeswitchenemy:GetValue() or lasttypelocal ~= typeswitchlocal:GetValue() or lastvis ~= visswitch:GetValue() then
 		SetSelections()
 		HideSettings(1)
 		HideSettings(2)
@@ -1561,6 +1785,9 @@ local function MenuHandler()
 		lastmode = modeswitch:GetValue()
 		lasttype = typeswitch:GetValue()
 		lasttypevm = typeswitchvm:GetValue()
+		lasttypeenemy = typeswitchenemy:GetValue()
+		lasttypelocal = typeswitchlocal:GetValue()
+		lastvis = visswitch:GetValue()
 	end
 	if lastbase ~= setting.base:GetValue() then
 		SetSelections()
@@ -1582,18 +1809,45 @@ local function CheckChanges()
 		for tempmode = 0, 3 do
 			local tempmodename = nil
 			if tempmode == 0 then tempmodename = "enemy" elseif tempmode == 1 then tempmodename = "friend" elseif tempmode == 2 then tempmodename = "loc" elseif tempmode == 3 then tempmodename = "viewmodel" else tempmodename = nil end
-			for temptype = 0, 3 do
-				local temptypename = nil
-				if tempmode == 3 then
-					if temptype == 0 then temptypename = "arms" elseif temptype == 1 then temptypename = "weapon" else temptypename = nil end
-				else
-					if temptype == 0 then temptypename = "vis" elseif temptype == 1 then temptypename = "iz" elseif temptype == 2 then temptypename = "attvis" elseif temptype == 3 then temptypename = "attiz" else temptypename = nil end
-				end
+			for temptype = 0, 2 do
+				for tempvis = 0, 1 do
+					local temptypename = nil
+					if tempmode == 3 then
+						if tempvis == 0 then
+							if temptype == 0 then temptypename = "arms" elseif temptype == 1 then temptypename = "weapon" else temptypename = nil end
+						else
+							temptypename = nil
+						end
+					elseif tempmode == 0 then
+						if tempvis == 0 then
+							if temptype == 0 then temptypename = "vis" elseif temptype == 1 then temptypename = "attvis" elseif temptype == 2 then temptypename = "btvis" else temptypename = nil end
+						elseif tempvis == 1 then
+							if temptype == 0 then temptypename = "iz" elseif temptype == 1 then temptypename = "attiz" elseif temptype == 2 then temptypename = "btiz" else temptypename = nil end
+						else
+							temptypename = nil
+						end
+					elseif tempmode == 2 then
+						if tempvis == 0 then
+							if temptype == 0 then temptypename = "vis" elseif temptype == 1 then temptypename = "attvis" elseif temptype == 2 then temptypename = "ghostvis" else temptypename = nil end
+						elseif tempvis == 1 then
+							if temptype == 0 then temptypename = "iz" elseif temptype == 1 then temptypename = "attiz" elseif temptype == 2 then temptypename = "ghostiz" else temptypename = nil end
+						else
+							temptypename = nil
+						end
+					else
+						if tempvis == 0 then
+							if temptype == 0 then temptypename = "vis" elseif temptype == 1 then temptypename = "attvis" else temptypename = nil end
+						elseif tempvis == 1 then
+							if temptype == 0 then temptypename = "iz" elseif temptype == 1 then temptypename = "attiz" else temptypename = nil end
+						else
+							temptypename = nil
+						end
+					end
 
-				if temptypename ~= nil and tempmodename ~= nil then
+					if temptypename ~= nil and tempmodename ~= nil then
 
-					local cache = cached[tempmodename][temptypename]
-					local setting = settings[tempmodename][temptypename]
+						local cache = cached[tempmodename][temptypename]
+						local setting = settings[tempmodename][temptypename]
 
 		local baser, baseg, baseb, basea = setting.baseclr:GetValue()
 		local reflectr, reflectg, reflectb = setting.reflectclr:GetValue()
@@ -1622,81 +1876,117 @@ local function CheckChanges()
 			RemoveDefaults()
 
 			if tempmode == 0 then
-				if temptype == 0 then
-					if setting.base:GetValue() == 0 then
-						EnemyVisMat = nil
-					else
-						EnemyVisMat = materials.Create("EnemyVisMat", DispatchMaterial(1, tempmodename, temptypename))
+				if tempvis == 0 then
+					if temptype == 0 then
+						if setting.base:GetValue() == 0 then
+							EnemyVisMat = nil
+						else
+							EnemyVisMat = materials.Create("EnemyVisMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.base:GetValue() == 0 then
+							EnemyAttVisMat = nil
+						else
+							EnemyAttVisMat = materials.Create("EnemyAttVisMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 2 then
+						if setting.base:GetValue() == 0 then
+							BtVisMat = nil
+						else
+							BtVisMat = materials.Create("BtVisMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
 					end
-				elseif temptype == 1 then
-					if setting.base:GetValue() == 0 then
-						EnemyIzMat = nil
-					else
-						EnemyIzMat = materials.Create("EnemyIzMat", DispatchMaterial(1, tempmodename, temptypename))
-					end
-				elseif temptype == 2 then
-					if setting.base:GetValue() == 0 then
-						EnemyAttVisMat = nil
-					else
-						EnemyAttVisMat = materials.Create("EnemyAttVisMat", DispatchMaterial(1, tempmodename, temptypename))
-					end
-				elseif temptype == 3 then
-					if setting.base:GetValue() == 0 then
-						EnemyAttIzMat = nil
-					else
-						EnemyAttIzMat = materials.Create("EnemyAttIzMat", DispatchMaterial(1, tempmodename, temptypename))
+				elseif tempvis == 1 then
+					if temptype == 0 then
+						if setting.base:GetValue() == 0 then
+							EnemyIzMat = nil
+						else
+							EnemyIzMat = materials.Create("EnemyIzMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.base:GetValue() == 0 then
+							EnemyAttIzMat = nil
+						else
+							EnemyAttIzMat = materials.Create("EnemyAttIzMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 2 then
+						if setting.base:GetValue() == 0 then
+							BtIzMat = nil
+						else
+							BtIzMat = materials.Create("BtIzMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
 					end
 				end
 			elseif tempmode == 1 then
-				if temptype == 0 then
-					if setting.base:GetValue() == 0 then
-						FriendVisMat = nil
-					else
-						FriendVisMat = materials.Create("FriendVisMat", DispatchMaterial(1, tempmodename, temptypename))
+				if tempvis == 0 then
+					if temptype == 0 then
+						if setting.base:GetValue() == 0 then
+							FriendVisMat = nil
+						else
+							FriendVisMat = materials.Create("FriendVisMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.base:GetValue() == 0 then
+							FriendAttVisMat = nil
+						else
+							FriendAttVisMat = materials.Create("FriendAttVisMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
 					end
-				elseif temptype == 1 then
-					if setting.base:GetValue() == 0 then
-						FriendIzMat = nil
-					else
-						FriendIzMat = materials.Create("FriendIzMat", DispatchMaterial(1, tempmodename, temptypename))
-					end
-				elseif temptype == 2 then
-					if setting.base:GetValue() == 0 then
-						FriendAttVisMat = nil
-					else
-						FriendAttVisMat = materials.Create("FriendAttVisMat", DispatchMaterial(1, tempmodename, temptypename))
-					end
-				elseif temptype == 3 then
-					if setting.base:GetValue() == 0 then
-						FriendAttIzMat = nil
-					else
-						FriendAttIzMat = materials.Create("FriendAttIzMat", DispatchMaterial(1, tempmodename, temptypename))
+				elseif tempvis == 1 then
+					if temptype == 0 then
+						if setting.base:GetValue() == 0 then
+							FriendIzMat = nil
+						else
+							FriendIzMat = materials.Create("FriendIzMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.base:GetValue() == 0 then
+							FriendAttIzMat = nil
+						else
+							FriendAttIzMat = materials.Create("FriendAttIzMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
 					end
 				end
 			elseif tempmode == 2 then
-				if temptype == 0 then
-					if setting.base:GetValue() == 0 then
-						LocalVisMat = nil
-					else
-						LocalVisMat = materials.Create("LocalVisMat", DispatchMaterial(1, tempmodename, temptypename))
+				if tempvis == 0 then
+					if temptype == 0 then
+						if setting.base:GetValue() == 0 then
+							LocalVisMat = nil
+						else
+							LocalVisMat = materials.Create("LocalVisMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.base:GetValue() == 0 then
+							LocalAttVisMat = nil
+						else
+							LocalAttVisMat = materials.Create("LocalAttVisMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 2 then
+						if setting.base:GetValue() == 0 then
+							GhostVisMat = nil
+						else
+							GhostVisMat = materials.Create("GhostVisMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
 					end
-				elseif temptype == 1 then
-					if setting.base:GetValue() == 0 then
-						LocalIzMat = nil
-					else
-						LocalIzMat = materials.Create("LocalIzMat", DispatchMaterial(1, tempmodename, temptypename))
-					end
-				elseif temptype == 2 then
-					if setting.base:GetValue() == 0 then
-						LocalAttVisMat = nil
-					else
-						LocalAttVisMat = materials.Create("LocalAttVisMat", DispatchMaterial(1, tempmodename, temptypename))
-					end
-				elseif temptype == 3 then
-					if setting.base:GetValue() == 0 then
-						LocalAttIzMat = nil
-					else
-						LocalAttIzMat = materials.Create("LocalAttIzMat", DispatchMaterial(1, tempmodename, temptypename))
+				elseif tempvis == 1 then
+					if temptype == 0 then
+						if setting.base:GetValue() == 0 then
+							LocalIzMat = nil
+						else
+							LocalIzMat = materials.Create("LocalIzMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.base:GetValue() == 0 then
+							LocalAttIzMat = nil
+						else
+							LocalAttIzMat = materials.Create("LocalAttIzMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
+					elseif temptype == 2 then
+						if setting.base:GetValue() == 0 then
+							GhostIzMat = nil
+						else
+							GhostIzMat = materials.Create("GhostIzMat", DispatchMaterial(1, tempmodename, temptypename))
+						end
 					end
 				end
 			elseif tempmode == 3 then
@@ -1758,81 +2048,117 @@ local function CheckChanges()
 			RemoveDefaults()
 
 			if tempmode == 0 then
-				if temptype == 0 then
-					if setting.overlay:GetValue() == 0 then
-						EnemyVisOverMat = nil
-					else
-						EnemyVisOverMat = materials.Create("EnemyVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+				if tempvis == 0 then
+					if temptype == 0 then
+						if setting.overlay:GetValue() == 0 then
+							EnemyVisOverMat = nil
+						else
+							EnemyVisOverMat = materials.Create("EnemyVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.overlay:GetValue() == 0 then
+							EnemyAttVisOverMat = nil
+						else
+							EnemyAttVisOverMat = materials.Create("EnemyAttVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 2 then
+						if setting.overlay:GetValue() == 0 then
+							BtVisOverMat = nil
+						else
+							BtVisOverMat = materials.Create("BtVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
 					end
-				elseif temptype == 1 then
-					if setting.overlay:GetValue() == 0 then
-						EnemyIzOverMat = nil
-					else
-						EnemyIzOverMat = materials.Create("EnemyIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
-					end
-				elseif temptype == 2 then
-					if setting.overlay:GetValue() == 0 then
-						EnemyAttVisOverMat = nil
-					else
-						EnemyAttVisOverMat = materials.Create("EnemyAttVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
-					end
-				elseif temptype == 3 then
-					if setting.overlay:GetValue() == 0 then
-						EnemyAttIzOverMat = nil
-					else
-						EnemyAttIzOverMat = materials.Create("EnemyAttIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+				elseif tempvis == 1 then
+					if temptype == 0 then
+						if setting.overlay:GetValue() == 0 then
+							EnemyIzOverMat = nil
+						else
+							EnemyIzOverMat = materials.Create("EnemyIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.overlay:GetValue() == 0 then
+							EnemyAttIzOverMat = nil
+						else
+							EnemyAttIzOverMat = materials.Create("EnemyAttIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 2 then
+						if setting.overlay:GetValue() == 0 then
+							BtIzOverMat = nil
+						else
+							BtIzOverMat = materials.Create("BtIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
 					end
 				end
 			elseif tempmode == 1 then
-				if temptype == 0 then
-					if setting.overlay:GetValue() == 0 then
-						FriendVisOverMat = nil
-					else
-						FriendVisOverMat = materials.Create("FriendVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+				if tempvis == 0 then
+					if temptype == 0 then
+						if setting.overlay:GetValue() == 0 then
+							FriendVisOverMat = nil
+						else
+							FriendVisOverMat = materials.Create("FriendVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.overlay:GetValue() == 0 then
+							FriendAttVisOverMat = nil
+						else
+							FriendAttVisOverMat = materials.Create("FriendAttVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
 					end
-				elseif temptype == 1 then
-					if setting.overlay:GetValue() == 0 then
-						FriendIzOverMat = nil
-					else
-						FriendIzOverMat = materials.Create("FriendIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
-					end
-				elseif temptype == 2 then
-					if setting.overlay:GetValue() == 0 then
-						FriendAttVisOverMat = nil
-					else
-						FriendAttVisOverMat = materials.Create("FriendAttVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
-					end
-				elseif temptype == 3 then
-					if setting.overlay:GetValue() == 0 then
-						FriendAttIzOverMat = nil
-					else
-						FriendAttIzOverMat = materials.Create("FriendAttIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+				elseif tempvis == 1 then
+					if temptype == 0 then
+						if setting.overlay:GetValue() == 0 then
+							FriendIzOverMat = nil
+						else
+							FriendIzOverMat = materials.Create("FriendIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.overlay:GetValue() == 0 then
+							FriendAttIzOverMat = nil
+						else
+							FriendAttIzOverMat = materials.Create("FriendAttIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
 					end
 				end
 			elseif tempmode == 2 then
-				if temptype == 0 then
-					if setting.overlay:GetValue() == 0 then
-						LocalVisOverMat = nil
-					else
-						LocalVisOverMat = materials.Create("LocalVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+				if tempvis == 0 then
+					if temptype == 0 then
+						if setting.overlay:GetValue() == 0 then
+							LocalVisOverMat = nil
+						else
+							LocalVisOverMat = materials.Create("LocalVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.overlay:GetValue() == 0 then
+							LocalAttVisOverMat = nil
+						else
+							LocalAttVisOverMat = materials.Create("LocalAttVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 2 then
+						if setting.overlay:GetValue() == 0 then
+							GhostVisOverMat = nil
+						else
+							GhostVisOverMat = materials.Create("GhostVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
 					end
-				elseif temptype == 1 then
-					if setting.overlay:GetValue() == 0 then
-						LocalIzOverMat = nil
-					else
-						LocalIzOverMat = materials.Create("LocalIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
-					end
-				elseif temptype == 2 then
-					if setting.overlay:GetValue() == 0 then
-						LocalAttVisOverMat = nil
-					else
-						LocalAttVisOverMat = materials.Create("LocalAttVisOverMat", DispatchMaterial(2, tempmodename, temptypename))
-					end
-				elseif temptype == 3 then
-					if setting.overlay:GetValue() == 0 then
-						LocalAttIzOverMat = nil
-					else
-						LocalAttIzOverMat = materials.Create("LocalAttIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+				elseif tempvis == 1 then
+					if temptype == 0 then
+						if setting.overlay:GetValue() == 0 then
+							LocalIzOverMat = nil
+						else
+							LocalIzOverMat = materials.Create("LocalIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 1 then
+						if setting.overlay:GetValue() == 0 then
+							LocalAttIzOverMat = nil
+						else
+							LocalAttIzOverMat = materials.Create("LocalAttIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
+					elseif temptype == 2 then
+						if setting.overlay:GetValue() == 0 then
+							GhostIzOverMat = nil
+						else
+							GhostIzOverMat = materials.Create("GhostIzOverMat", DispatchMaterial(2, tempmodename, temptypename))
+						end
 					end
 				end
 			elseif tempmode == 3 then
@@ -1863,6 +2189,7 @@ local function CheckChanges()
 			cache.overlaytexture = setting.overlaytexture:GetValue()
 			cache.overlayspeed = setting.overlayspeed:GetValue()
 			cache.overlayangle = setting.overlayangle:GetValue()
+		end
 		end
 		end
 		end
@@ -2020,6 +2347,54 @@ end
 
 callbacks.Register("DrawModel", ApplyChams)
 
+local function ApplyBtChams(Model)
+	local ent = Model:GetEntity()
+	if ent ~= nil then
+		if BtIzMat ~= nil then
+			Model:ForcedMaterialOverride(BtIzMat)
+			Model:DrawExtraPass()
+		end
+		if BtIzOverMat ~= nil then 
+			Model:ForcedMaterialOverride(BtIzOverMat)
+			Model:DrawExtraPass()
+		end
+		if BtVisMat ~= nil then
+			Model:ForcedMaterialOverride(BtVisMat)
+			Model:DrawExtraPass()
+		end
+		if BtVisOverMat ~= nil then
+			Model:ForcedMaterialOverride(BtVisOverMat)
+			Model:DrawExtraPass()
+		end
+	end
+end
+
+callbacks.Register("DrawModelBacktrack", ApplyBtChams)
+
+local function ApplyGhostChams(Model)
+	local ent = Model:GetEntity()
+	if ent ~= nil then
+		if GhostIzMat ~= nil then
+			Model:ForcedMaterialOverride(GhostIzMat)
+			Model:DrawExtraPass()
+		end
+		if GhostIzOverMat ~= nil then
+			Model:ForcedMaterialOverride(GhostIzOverMat)
+			Model:DrawExtraPass()
+		end
+		if GhostVisMat ~= nil then
+			Model:ForcedMaterialOverride(GhostVisMat)
+			Model:DrawExtraPass()
+		end
+		if GhostVisOverMat ~= nil then
+			Model:ForcedMaterialOverride(GhostVisOverMat)
+			Model:DrawExtraPass()
+		end
+	end
+end
+
+callbacks.Register("DrawModelGhost", ApplyGhostChams)
+
 local function RoundStart(e) --semi fix for default chams when loading new config
 	if e:GetName() == "round_start" then
 		RemoveDefaults()
@@ -2033,8 +2408,8 @@ local function OnUnload()
 	ref1:SetInvisible(0)
 	ref2:SetInvisible(0)
 	ref3:SetInvisible(0)
-	ref4:SetPosY(565)
-	ref5:SetPosY(290)
+	ref4:SetInvisible(0)
+	ref5:SetInvisible(0)
 	ref6:SetInvisible(0)
 end
 
