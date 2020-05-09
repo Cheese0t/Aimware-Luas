@@ -1,9 +1,5 @@
 -- settings
 local initial_height_modifier = 0.0725 -- vanilla is 0.0725
-local display_local_only = true
-local display_team_only = false
-local display_enemy_only = false
-local purge_killfeed_on_death = true
 
 local ref = gui.Reference("SETTINGS")
 local newtab = gui.Tab(ref, "rabisapaster.rainbowkillfeed", "Killfeed")
@@ -12,6 +8,7 @@ local bullshit = gui.Multibox(newtab, "Kills to display")
 local shitboxlocal = gui.Checkbox(bullshit, "rabisapaster.rainbowkillfeed.local", "Local", 1)
 local shitboxenemy = gui.Checkbox(bullshit, "rabisapaster.rainbowkillfeed.enemy", "Enemy", 1)
 local shitboxteam = gui.Checkbox(bullshit, "rabisapaster.rainbowkillfeed.team", "Team", 1)
+local idk = gui.Checkbox(newtab, "rabisapaster.rainbowkillfeed.wipeondeath", "Clear kills on death", 0)
 
 
 -- misc icons
@@ -147,7 +144,7 @@ callbacks.Register("FireGameEvent", function(event)
 			return
 		end
 
-		if (purge_killfeed_on_death and victim:GetIndex() == client.GetLocalPlayerIndex()) then
+		if (idk:GetValue() and victim:GetIndex() == client.GetLocalPlayerIndex()) then
 			kills = {}
 			return
 		end
@@ -405,8 +402,8 @@ callbacks.Register("Draw", function()
                 alpha = (globals.CurTime() - killtime) * 255 * 3
             end
 
-            if globals.CurTime() - killtime > 10 then
-                alpha = 255 - (globals.CurTime() - killtime - 10) * 255 * 2
+            if globals.CurTime() - killtime > 6 and attacker_entity:GetIndex() ~= client.GetLocalPlayerIndex() then
+                alpha = 255 - (globals.CurTime() - killtime - 6) * 255 * 2
                 if alpha <= 0 then
                     alpha = 0
                     table.remove(kills, index)
