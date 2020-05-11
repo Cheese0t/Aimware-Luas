@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "3.2"
+local VERSION_NUMBER = "3.2a"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -2510,7 +2510,7 @@ local function DoScopeBlend()
 		if IsScoped == 256 then IsScoped = 0 end
 		if IsScoped == 257 then IsScoped = 1 end
 
-		HeldWeapon = string.gsub(lp:GetPropEntity("m_hActiveWeapon"):GetClass(), "CWeapon", "")
+		HeldWeapon = lp:GetPropEntity("m_hActiveWeapon"):GetClass()
 
 		local blendvalue = scopeblendslider:GetValue() / 100
 
@@ -2666,7 +2666,7 @@ local function ApplyChams(Model)
 			end
 			if class == "CPredictedViewModel" then
 				if IsScoped == 1 then
-					if HeldWeapon ~= "Aug" and HeldWeapon ~= "SG556" then
+					if HeldWeapon ~= "CWeaponAug" and HeldWeapon ~= "CWeaponSG556" then
 						if WeaponMat ~= nil then
 							Model:ForcedMaterialOverride(WeaponMat)
 						end
