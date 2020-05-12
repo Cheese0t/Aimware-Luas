@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "3.3"
+local VERSION_NUMBER = "3.3a"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -169,6 +169,8 @@ scopeblendselector:SetPosY(-25)
 scopeblendslider:SetWidth(264)
 scopeblendslider:SetPosX(316)
 scopeblendslider:SetPosY(-25)
+
+local lp = nil
 
 local IsScoped, HeldWeapon, Modulated = nil, nil, false
 
@@ -2576,8 +2578,8 @@ end
 callbacks.Register("Draw", CheckChanges)
 
 local function DoScopeBlend()
-	local lp = entities.GetLocalPlayer()
-	if lp~= nil then
+	lp = entities.GetLocalPlayer()
+	if lp ~= nil then
 		IsScoped = lp:GetProp("m_bIsScoped");
 		if IsScoped == 256 then IsScoped = 0 end
 		if IsScoped == 257 then IsScoped = 1 end
@@ -2723,8 +2725,7 @@ callbacks.Register("Draw", DoScopeBlend)
 
 local function ApplyChams(Model)
 	local ent = Model:GetEntity()
-	local lp = entities.GetLocalPlayer()
-	if ent ~= nil then
+	if ent ~= nil and lp ~= nil then
 		local class = ent:GetClass()
 		if lp:IsAlive() then
 			if class == "CBaseAnimating" then
