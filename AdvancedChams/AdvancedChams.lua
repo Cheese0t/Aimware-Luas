@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "3.2a"
+local VERSION_NUMBER = "3.3"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -102,7 +102,7 @@ local modeswitch = gui.Combobox(group, "chams.modeswitch", "", "Enemy", "Friendl
 local typeswitchenemy = gui.Combobox(group, "chams.typeswitchenemy", "", "Model", "Attachment", "Backtrack")
 local typeswitchlocal = gui.Combobox(group, "chams.typeswitchlocal", "", "Model", "Attachment", "Ghost")
 local typeswitch = gui.Combobox(group, "chams.typeswitch", "", "Model", "Attachment")
-local typeswitchvm = gui.Combobox(group, "chams.typeswitchvm", "", "Arms", "Weapon")
+local typeswitchvm = gui.Combobox(group, "chams.typeswitchvm", "", "Arms", "Sleeves", "Weapon")
 local visswitch = gui.Combobox(group, "chams.visswitch", "", "Visible", "Invisible")
 local advancedcheck = gui.Checkbox(group, "chams.advancedmode", "", 0)
 local text2 = gui.Text(group, "Advanced Mode")
@@ -180,7 +180,7 @@ local GhostVisMat, GhostIzMat, GhostVisOverMat, GhostIzOverMat = nil, nil, nil, 
 local EnemyAttVisMat, EnemyAttIzMat, EnemyAttVisOverMat, EnemyAttIzOverMat = nil, nil, nil, nil
 local FriendAttVisMat, FriendAttIzMat, FriendAttVisOverMat, FriendAttIzOverMat = nil, nil, nil, nil
 local LocalAttVisMat, LocalAttIzMat, LocalAttVisOverMat, LocalAttIzOverMat = nil, nil, nil, nil
-local ArmsMat, ArmsOverMat, WeaponMat, WeaponOverMat = nil, nil, nil, nil
+local ArmsMat, ArmsOverMat, SleevesMat, SleevesOverMat, WeaponMat, WeaponOverMat = nil, nil, nil, nil, nil, nil
 
 local function RemoveDefaults()
 	gui.SetValue("esp.chams.enemy.occluded", 0)
@@ -743,6 +743,36 @@ local settings = {
 			overlayangle = gui.Slider(advancedgroup, "vm.arms.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
 			overlaytexture = gui.Editbox(advancedgroup, "vm.arms.overlaytexture", " ")
 		},
+		sleeves = {
+			base = gui.Combobox(group, "vm.sleeves.base", "Base", "Off", "Color", "Flat", "Invisible"),
+			baseclr = gui.ColorPicker(group, "vm.sleeves.base.clr", "", 255, 0, 0, 255 ),
+			overlay = gui.Combobox(group, "vm.sleeves.overlay", "Overlay", "Off", "Glow", "Wireframe", "Wireframe glow", "Custom"),
+			overlayclr = gui.ColorPicker(group, "vm.sleeves.overlay.clr", "", 255, 255, 255, 255 ),
+			reflect = gui.Slider(group, "vm.sleeves.reflect", "Reflectivity", 0, 0, 5, 0.01 ),
+			reflectboost = gui.Checkbox(group, "vm.sleeves.reflectboost", "Boost", 0),
+			reflectclr = gui.ColorPicker(group, "vm.sleeves.reflect.clr", "", 255, 255, 255, 255 ),
+			shine = gui.Slider(group, "vm.sleeves.shine", "Shine", 0, 0, 5, 0.01 ),
+			shineclr = gui.ColorPicker(group, "vm.sleeves.shineclr", "", 255, 255, 255, 255 ),
+			shineboost = gui.Checkbox(group, "vm.sleeves.shineboost", "Boost", 0),
+			rim = gui.Slider(group, "vm.sleeves.rim", "Rimlight", 0, 0, 10, 0.01 ),
+			rimboost = gui.Checkbox(group, "vm.sleeves.rimboost", "Boost", 0),
+			pearl = gui.Slider(group, "vm.sleeves.pearl", "Pearlescent", 0, -15, 15, 0.01 ),
+			glowx = gui.Slider(group, "vm.sleeves.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
+			glowy = gui.Slider(group, "vm.sleeves.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
+			glowz = gui.Slider(group, "vm.sleeves.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
+			basetexturecheck = gui.Checkbox(advancedgroup, "vm.sleeves.basetexturecheck", "Custom Texture", 0),
+			basespeed = gui.Slider(advancedgroup, "vm.sleeves.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			baseangle = gui.Slider(advancedgroup, "vm.sleeves.baseangle", "Animation Angle", 90, -180, 180, 1 ),
+			basetexture = gui.Editbox(advancedgroup, "vm.sleeves.basetexture", " "),
+			bumpcheck = gui.Checkbox(advancedgroup, "vm.sleeves.bumpcheck", "Enable", 0),
+			bumpspeed = gui.Slider(advancedgroup, "vm.sleeves.bumpspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			bumpangle = gui.Slider(advancedgroup, "vm.sleeves.bumpangle", "Animation Angle", 90, -180, 180, 1 ),
+			bumpmap = gui.Editbox(advancedgroup, "vm.sleeves.bumpmap", " "),
+			overlaywireframe = gui.Checkbox(advancedgroup, "vm.sleeves.overlaywireframe", "Wireframe", 0),
+			overlayspeed = gui.Slider(advancedgroup, "vm.sleeves.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
+			overlayangle = gui.Slider(advancedgroup, "vm.sleeves.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
+			overlaytexture = gui.Editbox(advancedgroup, "vm.sleeves.overlaytexture", " ")
+		},
 		weapon = {
 			base = gui.Combobox(group, "vm.weapon.base", "Base", "Off", "Color", "Flat", "Invisible"),
 			baseclr = gui.ColorPicker(group, "vm.weapon.base.clr", "", 255, 0, 0, 255 ),
@@ -1304,6 +1334,36 @@ local cached = {
 			overlayangle = nil,
 			overlaytexture = nil
 		},
+		sleeves = {
+			base = nil,
+			baseclr = {r = nil, g = nil, b = nil, a = nil},
+			overlay = nil,
+			overlayclr = {r = nil, g = nil, b = nil, a = nil},
+			reflect = nil,
+			reflectboost = nil,
+			reflectclr = {r = nil, g = nil, b = nil},
+			shine = nil,
+			shineclr = {r = nil, g = nil, b = nil},
+			shineboost = nil,
+			rim = nil,
+			rimboost = nil,
+			pearl = nil,
+			glowx = nil,
+			glowy = nil,
+			glowz = nil,
+			basetexturecheck = nil,
+			basespeed = nil,
+			baseangle = nil,
+			basetexture = nil,
+			bumpcheck = nil,
+			bumpspeed = nil,
+			bumpangle = nil,
+			bumpmap = nil,
+			overlaywireframe = nil,
+			overlayspeed = nil,
+			overlayangle = nil,
+			overlaytexture = nil
+		},
 		weapon = {
 			base = nil,
 			baseclr = {r = nil, g = nil, b = nil, a = nil},
@@ -1354,7 +1414,7 @@ local function SetSelections()
 	end
 	if selectedmode == 0 then modename = "enemy" elseif selectedmode == 1 then modename = "friend" elseif selectedmode == 2 then modename = "loc" elseif selectedmode == 3 then modename = "viewmodel" else modename = nil end
 	if selectedmode == 3 then
-		if selectedtype == 0 then typename = "arms" elseif selectedtype == 1 then typename = "weapon" else typename = nil end
+		if selectedtype == 0 then typename = "arms" elseif selectedtype == 1 then typename = "sleeves" elseif selectedtype == 2 then typename = "weapon" else typename = nil end
 	elseif selectedmode == 0 then
 		if selectedvis == 0 then
 			if selectedtype == 0 then typename = "vis" elseif selectedtype == 1 then typename = "attvis" elseif selectedtype == 2 then typename = "btvis" else typename = nil end
@@ -2086,7 +2146,7 @@ local function CheckChanges()
 					local temptypename = nil
 					if tempmode == 3 then
 						if tempvis == 0 then
-							if temptype == 0 then temptypename = "arms" elseif temptype == 1 then temptypename = "weapon" else temptypename = nil end
+							if temptype == 0 then temptypename = "arms" elseif temptype == 1 then temptypename = "sleeves" elseif temptype == 2 then temptypename = "weapon" else temptypename = nil end
 						else
 							temptypename = nil
 						end
@@ -2292,6 +2352,12 @@ local function CheckChanges()
 					end
 				elseif temptype == 1 then
 					if setting.base:GetValue() == 0 then
+						SleevesMat = nil
+					else
+						SleevesMat = materials.Create("SleevesMat", DispatchMaterial(1, tempmodename, temptypename))
+					end
+				elseif temptype == 2 then
+					if setting.base:GetValue() == 0 then
 						WeaponMat = nil
 					else
 						WeaponMat = materials.Create("WeaponMat", DispatchMaterial(1, tempmodename, temptypename))
@@ -2470,6 +2536,12 @@ local function CheckChanges()
 						ArmsOverMat = materials.Create("ArmsOverMat", DispatchMaterial(2, tempmodename, temptypename))
 					end
 				elseif temptype == 1 then
+					if setting.overlay:GetValue() == 0 then
+						SleevesOverMat = nil
+					else
+						SleevesOverMat = materials.Create("SleevesOverMat", DispatchMaterial(2, tempmodename, temptypename))
+					end
+				elseif temptype == 2 then
 					if setting.overlay:GetValue() == 0 then
 						WeaponOverMat = nil
 					else
@@ -2656,12 +2728,22 @@ local function ApplyChams(Model)
 		local class = ent:GetClass()
 		if lp:IsAlive() then
 			if class == "CBaseAnimating" then
-				if ArmsMat ~= nil then
-					Model:ForcedMaterialOverride(ArmsMat)
-				end
-				if ArmsOverMat ~= nil then
-					Model:DrawExtraPass()
-					Model:ForcedMaterialOverride(ArmsOverMat)
+				if string.find(ent:GetModelName(), "v_sleeve") then
+					if SleevesMat ~= nil then
+						Model:ForcedMaterialOverride(SleevesMat)
+					end
+					if SleevesOverMat ~= nil then
+						Model:DrawExtraPass()
+						Model:ForcedMaterialOverride(SleevesOverMat)
+					end
+				else
+					if ArmsMat ~= nil then
+						Model:ForcedMaterialOverride(ArmsMat)
+					end
+					if ArmsOverMat ~= nil then
+						Model:DrawExtraPass()
+						Model:ForcedMaterialOverride(ArmsOverMat)
+					end
 				end
 			end
 			if class == "CPredictedViewModel" then
