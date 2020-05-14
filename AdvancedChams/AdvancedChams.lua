@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "3.3a"
+local VERSION_NUMBER = "3.4"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -226,7 +226,7 @@ local settings = {
 			glowx = gui.Slider(group, "enemy.vis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "enemy.vis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "enemy.vis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.vis.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.vis.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "enemy.vis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "enemy.vis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "enemy.vis.basetexture", " "),
@@ -239,7 +239,9 @@ local settings = {
 			overlayangle = gui.Slider(advancedgroup, "enemy.vis.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
 			overlaytexture = gui.Editbox(advancedgroup, "enemy.vis.overlaytexture", " "),
 			healthbased = gui.Checkbox(group, "enemy.vis.healthbased", "", 0),
-			healthbasedtext = gui.Text(group, "Health based")
+			healthbasedtext = gui.Text(group, "Health based"),
+			basetextureangle = gui.Slider(advancedgroup, "enemy.vis.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "enemy.vis.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 	   	},
 	   	iz = {
 			base = gui.Combobox(group, "enemy.iz.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -258,7 +260,7 @@ local settings = {
 			glowx = gui.Slider(group, "enemy.iz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "enemy.iz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "enemy.iz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.iz.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.iz.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "enemy.iz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "enemy.iz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "enemy.iz.basetexture", " "),
@@ -271,7 +273,9 @@ local settings = {
 			overlayangle = gui.Slider(advancedgroup, "enemy.iz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
 			overlaytexture = gui.Editbox(advancedgroup, "enemy.iz.overlaytexture", " "),
 			healthbased = gui.Checkbox(group, "enemy.iz.healthbased", "", 0),
-			healthbasedtext = gui.Text(group, "Health based")
+			healthbasedtext = gui.Text(group, "Health based"),
+			basetextureangle = gui.Slider(advancedgroup, "enemy.iz.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "enemy.iz.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 		   },
 		attvis = {
 			base = gui.Combobox(group, "enemy.attvis.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -290,7 +294,7 @@ local settings = {
 			glowx = gui.Slider(group, "enemy.attvis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "enemy.attvis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "enemy.attvis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.attvis.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.attvis.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "enemy.attvis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "enemy.attvis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "enemy.attvis.basetexture", " "),
@@ -301,7 +305,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "enemy.attvis.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "enemy.attvis.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "enemy.attvis.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "enemy.attvis.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "enemy.attvis.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "enemy.attvis.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "enemy.attvis.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
   		},
 	   	attiz = {
 			base = gui.Combobox(group, "enemy.attiz.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -320,7 +326,7 @@ local settings = {
 			glowx = gui.Slider(group, "enemy.attiz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "enemy.attiz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "enemy.attiz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.attiz.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.attiz.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "enemy.attiz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "enemy.attiz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "enemy.attiz.basetexture", " "),
@@ -331,7 +337,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "enemy.attiz.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "enemy.attiz.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "enemy.attiz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "enemy.attiz.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "enemy.attiz.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "enemy.attiz.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "enemy.attiz.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 		},
 		btvis = {
 			base = gui.Combobox(group, "enemy.btvis.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -350,7 +358,7 @@ local settings = {
 			glowx = gui.Slider(group, "enemy.btvis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "enemy.btvis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "enemy.btvis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.btvis.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.btvis.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "enemy.btvis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "enemy.btvis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "enemy.btvis.basetexture", " "),
@@ -365,7 +373,9 @@ local settings = {
 			speedbased = gui.Checkbox(group, "enemy.btvis.speedbased", "", 0),
 			speedbasedtext = gui.Text(group, "Speed based"),
 			speedbasedover = gui.Checkbox(group, "enemy.btvis.speedbasedoverlay", "", 0),
-			speedbasedtextover = gui.Text(group, "Speed based")
+			speedbasedtextover = gui.Text(group, "Speed based"),
+			basetextureangle = gui.Slider(advancedgroup, "enemy.btvis.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "enemy.btvis.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 		},
 		btiz = {
 			base = gui.Combobox(group, "enemy.btiz.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -384,7 +394,7 @@ local settings = {
 			glowx = gui.Slider(group, "enemy.btiz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "enemy.btiz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "enemy.btiz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.btiz.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "enemy.btiz.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "enemy.btiz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "enemy.btiz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "enemy.btiz.basetexture", " "),
@@ -399,7 +409,9 @@ local settings = {
 			speedbased = gui.Checkbox(group, "enemy.btiz.speedbased", "", 0),
 			speedbasedtext = gui.Text(group, "Speed based"),
 			speedbasedover = gui.Checkbox(group, "enemy.btiz.speedbasedoverlay", "", 0),
-			speedbasedtextover = gui.Text(group, "Speed based")
+			speedbasedtextover = gui.Text(group, "Speed based"),
+			basetextureangle = gui.Slider(advancedgroup, "enemy.btiz.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "enemy.btiz.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
   		}
    	},
    friend = {
@@ -420,7 +432,7 @@ local settings = {
 			glowx = gui.Slider(group, "friend.vis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "friend.vis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "friend.vis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "friend.vis.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "friend.vis.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "friend.vis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "friend.vis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "friend.vis.basetexture", " "),
@@ -433,7 +445,9 @@ local settings = {
 			overlayangle = gui.Slider(advancedgroup, "friend.vis.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
 			overlaytexture = gui.Editbox(advancedgroup, "friend.vis.overlaytexture", " "),
 			healthbased = gui.Checkbox(group, "friend.vis.healthbased", "", 0),
-			healthbasedtext = gui.Text(group, "Health based")
+			healthbasedtext = gui.Text(group, "Health based"),
+			basetextureangle = gui.Slider(advancedgroup, "friend.vis.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "friend.vis.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 	   	},
 	   	iz = {
 			base = gui.Combobox(group, "friend.iz.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -452,7 +466,7 @@ local settings = {
 			glowx = gui.Slider(group, "friend.iz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "friend.iz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "friend.iz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "friend.iz.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "friend.iz.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "friend.iz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "friend.iz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "friend.iz.basetexture", " "),
@@ -465,7 +479,9 @@ local settings = {
 			overlayangle = gui.Slider(advancedgroup, "friend.iz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
 			overlaytexture = gui.Editbox(advancedgroup, "friend.iz.overlaytexture", " "),
 			healthbased = gui.Checkbox(group, "friend.iz.healthbased", "", 0),
-			healthbasedtext = gui.Text(group, "Health based")
+			healthbasedtext = gui.Text(group, "Health based"),
+			basetextureangle = gui.Slider(advancedgroup, "friend.iz.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "friend.iz.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 	   	},
 	   	attvis = {
 			base = gui.Combobox(group, "friend.attvis.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -484,7 +500,7 @@ local settings = {
 			glowx = gui.Slider(group, "friend.attvis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "friend.attvis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "friend.attvis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "friend.attvis.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "friend.attvis.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "friend.attvis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "friend.attvis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "friend.attvis.basetexture", " "),
@@ -495,7 +511,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "friend.attvis.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "friend.attvis.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "friend.attvis.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "friend.attvis.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "friend.attvis.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "friend.attvis.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "friend.attvis.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
    		},
 	   	attiz = {
 			base = gui.Combobox(group, "friend.attiz.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -514,7 +532,7 @@ local settings = {
 			glowx = gui.Slider(group, "friend.attiz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "friend.attiz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "friend.attiz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "friend.attiz.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "friend.attiz.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "friend.attiz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "friend.attiz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "friend.attiz.basetexture", " "),
@@ -525,7 +543,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "friend.attiz.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "friend.attiz.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "friend.attiz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "friend.attiz.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "friend.attiz.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "friend.attiz.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "friend.attiz.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
    		}
    	},
    loc = {
@@ -546,7 +566,7 @@ local settings = {
 			glowx = gui.Slider(group, "loc.vis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "loc.vis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "loc.vis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "loc.vis.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "loc.vis.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "loc.vis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "loc.vis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "loc.vis.basetexture", " "),
@@ -559,7 +579,9 @@ local settings = {
 			overlayangle = gui.Slider(advancedgroup, "loc.vis.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
 			overlaytexture = gui.Editbox(advancedgroup, "loc.vis.overlaytexture", " "),
 			healthbased = gui.Checkbox(group, "loc.vis.healthbased", "", 0),
-			healthbasedtext = gui.Text(group, "Health based")
+			healthbasedtext = gui.Text(group, "Health based"),
+			basetextureangle = gui.Slider(advancedgroup, "loc.vis.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "loc.vis.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 	   	},
 		iz = {
 			base = gui.Combobox(group, "loc.iz.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -578,7 +600,7 @@ local settings = {
 			glowx = gui.Slider(group, "loc.iz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "loc.iz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "loc.iz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "loc.iz.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "loc.iz.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "loc.iz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "loc.iz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "loc.iz.basetexture", " "),
@@ -591,7 +613,9 @@ local settings = {
 			overlayangle = gui.Slider(advancedgroup, "loc.iz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
 			overlaytexture = gui.Editbox(advancedgroup, "loc.iz.overlaytexture", " "),
 			healthbased = gui.Checkbox(group, "loc.iz.healthbased", "", 0),
-			healthbasedtext = gui.Text(group, "Health based")
+			healthbasedtext = gui.Text(group, "Health based"),
+			basetextureangle = gui.Slider(advancedgroup, "loc.iz.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "loc.iz.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 	   	},
 	   	attvis = {
 			base = gui.Combobox(group, "loc.attvis.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -610,7 +634,7 @@ local settings = {
 			glowx = gui.Slider(group, "loc.attvis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "loc.attvis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "loc.attvis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "loc.attvis.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "loc.attvis.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "loc.attvis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "loc.attvis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "loc.attvis.basetexture", " "),
@@ -621,7 +645,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "loc.attvis.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "loc.attvis.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "loc.attvis.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "loc.attvis.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "loc.attvis.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "loc.attvis.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "loc.attvis.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 		},
 		attiz = {
 			base = gui.Combobox(group, "loc.attiz.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -640,7 +666,7 @@ local settings = {
 			glowx = gui.Slider(group, "loc.attiz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "loc.attiz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "loc.attiz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "loc.attiz.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "loc.attiz.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "loc.attiz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "loc.attiz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "loc.attiz.basetexture", " "),
@@ -651,7 +677,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "loc.attiz.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "loc.attiz.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "loc.attiz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "loc.attiz.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "loc.attiz.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "loc.attiz.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "loc.attiz.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 		},
 		ghostvis = {
 			base = gui.Combobox(group, "loc.ghostvis.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -670,7 +698,7 @@ local settings = {
 			glowx = gui.Slider(group, "loc.ghostvis.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "loc.ghostvis.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "loc.ghostvis.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "loc.ghostvis.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "loc.ghostvis.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "loc.ghostvis.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "loc.ghostvis.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "loc.ghostvis.basetexture", " "),
@@ -681,7 +709,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "loc.ghostvis.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "loc.ghostvis.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "loc.ghostvis.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "loc.ghostvis.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "loc.ghostvis.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "loc.ghostvis.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "loc.ghostvis.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 	   	},
 		ghostiz = {
 			base = gui.Combobox(group, "loc.ghostiz.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -700,7 +730,7 @@ local settings = {
 			glowx = gui.Slider(group, "loc.ghostiz.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "loc.ghostiz.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "loc.ghostiz.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "loc.ghostiz.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "loc.ghostiz.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "loc.ghostiz.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "loc.ghostiz.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "loc.ghostiz.basetexture", " "),
@@ -711,7 +741,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "loc.ghostiz.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "loc.ghostiz.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "loc.ghostiz.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "loc.ghostiz.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "loc.ghostiz.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "loc.ghostiz.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "loc.ghostiz.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 	   	}
 	},
 	viewmodel = {
@@ -732,7 +764,7 @@ local settings = {
 			glowx = gui.Slider(group, "vm.arms.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "vm.arms.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "vm.arms.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "vm.arms.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "vm.arms.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "vm.arms.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "vm.arms.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "vm.arms.basetexture", " "),
@@ -743,7 +775,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "vm.arms.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "vm.arms.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "vm.arms.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "vm.arms.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "vm.arms.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "vm.arms.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "vm.arms.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 		},
 		sleeves = {
 			base = gui.Combobox(group, "vm.sleeves.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -762,7 +796,7 @@ local settings = {
 			glowx = gui.Slider(group, "vm.sleeves.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "vm.sleeves.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "vm.sleeves.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "vm.sleeves.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "vm.sleeves.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "vm.sleeves.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "vm.sleeves.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "vm.sleeves.basetexture", " "),
@@ -773,7 +807,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "vm.sleeves.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "vm.sleeves.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "vm.sleeves.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "vm.sleeves.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "vm.sleeves.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "vm.sleeves.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "vm.sleeves.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 		},
 		weapon = {
 			base = gui.Combobox(group, "vm.weapon.base", "Base", "Off", "Color", "Flat", "Invisible"),
@@ -792,7 +828,7 @@ local settings = {
 			glowx = gui.Slider(group, "vm.weapon.glowx", "Overlay glow X", 0, 0, 50, 0.01 ),
 			glowy = gui.Slider(group, "vm.weapon.glowy", "Overlay glow Y", 1.5, 0, 50, 0.01 ),
 			glowz = gui.Slider(group, "vm.weapon.glowz", "Overlay glow Z", 3, 0, 50, 0.01 ),
-			basetexturecheck = gui.Checkbox(advancedgroup, "vm.weapon.basetexturecheck", "Custom Texture", 0),
+			basetexturecheck = gui.Checkbox(advancedgroup, "vm.weapon.basetexturecheck", "Use Texture", 0),
 			basespeed = gui.Slider(advancedgroup, "vm.weapon.basespeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			baseangle = gui.Slider(advancedgroup, "vm.weapon.baseangle", "Animation Angle", 90, -180, 180, 1 ),
 			basetexture = gui.Editbox(advancedgroup, "vm.weapon.basetexture", " "),
@@ -803,7 +839,9 @@ local settings = {
 			overlaywireframe = gui.Checkbox(advancedgroup, "vm.weapon.overlaywireframe", "Wireframe", 0),
 			overlayspeed = gui.Slider(advancedgroup, "vm.weapon.overlayspeed", "Animation Speed", 0, 0, 1, 0.01 ),
 			overlayangle = gui.Slider(advancedgroup, "vm.weapon.overlayangle", "Animation Angle", 90, -180, 180, 1 ),
-			overlaytexture = gui.Editbox(advancedgroup, "vm.weapon.overlaytexture", " ")
+			overlaytexture = gui.Editbox(advancedgroup, "vm.weapon.overlaytexture", " "),
+			basetextureangle = gui.Slider(advancedgroup, "vm.weapon.basetextureangle", "Texture Angle", 0, -180, 180, 1 ),
+			overlaytextureangle = gui.Slider(advancedgroup, "vm.weapon.overlaytextureangle", "Texture Angle", 0, -180, 180, 1 )
 		}
 	}
 }
@@ -839,7 +877,9 @@ local cached = {
 			overlayspeed = nil,
 			overlayangle = nil,
 			overlaytexture = nil,
-			healthbased = nil
+			healthbased = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 	   	},
 	   	iz = {
 			base = nil,
@@ -870,7 +910,9 @@ local cached = {
 			overlayspeed = nil,
 			overlayangle = nil,
 			overlaytexture = nil,
-			healthbased = nil
+			healthbased = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 	   	},
 	   	attvis = {
 			base = nil,
@@ -900,7 +942,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 	   	attiz = {
 			base = nil,
@@ -930,7 +974,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 		btvis = {
 			base = nil,
@@ -962,7 +1008,9 @@ local cached = {
 			overlayangle = nil,
 			overlaytexture = nil,
 			speedbased = nil,
-			speedbasedover = nil
+			speedbasedover = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 	   	btiz = {
 			base = nil,
@@ -994,7 +1042,9 @@ local cached = {
 			overlayangle = nil,
 			overlaytexture = nil,
 			speedbased = nil,
-			speedbasedover = nil
+			speedbasedover = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
    		}  
    	},
    	friend = {
@@ -1027,7 +1077,9 @@ local cached = {
 			overlayspeed = nil,
 			overlayangle = nil,
 			overlaytexture = nil,
-			healthbased = nil
+			healthbased = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 	   	},
 	   	iz = {
 			base = nil,
@@ -1058,7 +1110,9 @@ local cached = {
 			overlayspeed = nil,
 			overlayangle = nil,
 			overlaytexture = nil,
-			healthbased = nil
+			healthbased = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 		attvis = {
 			base = nil,
@@ -1088,7 +1142,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 	   	attiz = {
 			base = nil,
@@ -1118,7 +1174,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
    		}
    	},
    	loc = {
@@ -1151,7 +1209,9 @@ local cached = {
 			overlayspeed = nil,
 			overlayangle = nil,
 			overlaytexture = nil,
-			healthbased = nil
+			healthbased = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 	   	},
 	   	iz = {
 			base = nil,
@@ -1182,7 +1242,9 @@ local cached = {
 			overlayspeed = nil,
 			overlayangle = nil,
 			overlaytexture = nil,
-			healthbased = nil
+			healthbased = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 		attvis = {
 			base = nil,
@@ -1212,7 +1274,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 	   	attiz = {
 			base = nil,
@@ -1242,7 +1306,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 		ghostvis = {
 			base = nil,
@@ -1272,7 +1338,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 	   	},
 	   	ghostiz = {
 			base = nil,
@@ -1302,7 +1370,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		}
 	},
 	viewmodel = {
@@ -1334,7 +1404,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 		sleeves = {
 			base = nil,
@@ -1364,7 +1436,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		},
 		weapon = {
 			base = nil,
@@ -1394,7 +1468,9 @@ local cached = {
 			overlaywireframe = nil,
 			overlayspeed = nil,
 			overlayangle = nil,
-			overlaytexture = nil
+			overlaytexture = nil,
+			basetextureangle = nil,
+			overlaytextureangle = nil
 		}
 	}
 }
@@ -1489,12 +1565,15 @@ local function SetupMenu()
 			setting.glowz:SetPosX(400)
 			setting.glowz:SetPosY(290)
 			setting.basetexturecheck:SetPosY(0)
-			setting.basespeed:SetWidth(200)
-			setting.basespeed:SetPosX(150)
+			setting.basespeed:SetWidth(140)
+			setting.basespeed:SetPosX(105)
 			setting.basespeed:SetPosY(-13)
-			setting.baseangle:SetWidth(200)
-			setting.baseangle:SetPosX(375)
+			setting.baseangle:SetWidth(140)
+			setting.baseangle:SetPosX(270)
 			setting.baseangle:SetPosY(-13)
+			setting.basetextureangle:SetWidth(140)
+			setting.basetextureangle:SetPosX(435)
+			setting.basetextureangle:SetPosY(-13)
 			setting.basetexture:SetPosY(15)
 			setting.basetexture:SetValue("models/weapons/customization/materials/gradient")
 			setting.bumpcheck:SetPosY(100)
@@ -1507,12 +1586,15 @@ local function SetupMenu()
 			setting.bumpmap:SetPosY(115)
 			setting.bumpmap:SetValue("de_nuke/hr_nuke/hr_river_water_001_normal")
 			setting.overlaywireframe:SetPosY(200)
-			setting.overlayspeed:SetWidth(200)
-			setting.overlayspeed:SetPosX(150)
+			setting.overlayspeed:SetWidth(140)
+			setting.overlayspeed:SetPosX(105)
 			setting.overlayspeed:SetPosY(187)
-			setting.overlayangle:SetWidth(200)
-			setting.overlayangle:SetPosX(375)
+			setting.overlayangle:SetWidth(140)
+			setting.overlayangle:SetPosX(270)
 			setting.overlayangle:SetPosY(187)
+			setting.overlaytextureangle:SetWidth(140)
+			setting.overlaytextureangle:SetPosX(435)
+			setting.overlaytextureangle:SetPosY(187)
 			setting.overlaytexture:SetPosY(215)
 			setting.overlaytexture:SetValue("models/inventory_items/music_kit/darude_01/mp3_detail")
 			if setting.speedbased ~= nil then
@@ -1666,6 +1748,7 @@ local function HideSettings(i)
 			settings[modename][typename]["basetexture"]:SetDisabled(true)
 			settings[modename][typename]["basespeed"]:SetDisabled(true)
 			settings[modename][typename]["baseangle"]:SetDisabled(true)
+			settings[modename][typename]["basetextureangle"]:SetDisabled(true)
 			settings[modename][typename]["bumpcheck"]:SetDisabled(true)
 			settings[modename][typename]["bumpmap"]:SetDisabled(true)
 			settings[modename][typename]["bumpspeed"]:SetDisabled(true)
@@ -1678,6 +1761,7 @@ local function HideSettings(i)
 				settings[modename][typename]["basetexture"]:SetDisabled(false)
 				settings[modename][typename]["basespeed"]:SetDisabled(false)
 				settings[modename][typename]["baseangle"]:SetDisabled(false)
+				settings[modename][typename]["basetextureangle"]:SetDisabled(false)
 				settings[modename][typename]["bumpcheck"]:SetDisabled(false)
 				settings[modename][typename]["bumpmap"]:SetDisabled(false)
 				settings[modename][typename]["bumpspeed"]:SetDisabled(false)
@@ -1689,6 +1773,7 @@ local function HideSettings(i)
 				settings[modename][typename]["basetexture"]:SetDisabled(false)
 				settings[modename][typename]["basespeed"]:SetDisabled(false)
 				settings[modename][typename]["baseangle"]:SetDisabled(false)
+				settings[modename][typename]["basetextureangle"]:SetDisabled(false)
 				settings[modename][typename]["bumpcheck"]:SetDisabled(true)
 				settings[modename][typename]["bumpmap"]:SetDisabled(true)
 				settings[modename][typename]["bumpspeed"]:SetDisabled(true)
@@ -1756,12 +1841,14 @@ local function HideSettings(i)
 			settings[modename][typename]["overlayangle"]:SetDisabled(false)
 			settings[modename][typename]["overlayspeed"]:SetDisabled(false)
 			settings[modename][typename]["overlaytexture"]:SetDisabled(false)
+			settings[modename][typename]["overlaytextureangle"]:SetDisabled(false)
 			overlaytext:SetDisabled(false)
 		else
 			settings[modename][typename]["overlaywireframe"]:SetDisabled(true)
 			settings[modename][typename]["overlayangle"]:SetDisabled(true)
 			settings[modename][typename]["overlayspeed"]:SetDisabled(true)
 			settings[modename][typename]["overlaytexture"]:SetDisabled(true)
+			settings[modename][typename]["overlaytextureangle"]:SetDisabled(true)
 			overlaytext:SetDisabled(true)
 		end
 	end
@@ -1788,6 +1875,7 @@ local function DispatchMaterial(i, dmode, dtype)
 		local baseangle = settings[dmode][dtype]["baseangle"]:GetValue()
 		local bumpspeed = settings[dmode][dtype]["bumpspeed"]:GetValue()
 		local bumpangle = settings[dmode][dtype]["bumpangle"]:GetValue()
+		local basetextureangle = settings[dmode][dtype]["basetextureangle"]:GetValue()
 		if settings[dmode][dtype]["basetexturecheck"]:GetValue() then
 			texture = settings[dmode][dtype]["basetexture"]:GetValue()
 		end
@@ -1915,7 +2003,7 @@ local function DispatchMaterial(i, dmode, dtype)
 			"$alpha_unclamped"			"0.0"
 
 			"$translate"				"[0.0 0.0]"
-			"$angle" 					"0"
+			"$angle" 					"]].. basetextureangle ..[["
 
 			"Proxies"
 			{
@@ -1963,6 +2051,7 @@ local function DispatchMaterial(i, dmode, dtype)
 		end
 		local overlayspeed = settings[dmode][dtype]["overlayspeed"]:GetValue()
 		local overlayangle = settings[dmode][dtype]["overlayangle"]:GetValue()
+		local overlaytextureangle = settings[dmode][dtype]["overlaytextureangle"]:GetValue()
 
 		local alphaparam = [["$alpha" 					"]].. a/255 ..[["]]
 		local proxies = ""
@@ -2055,7 +2144,7 @@ local function DispatchMaterial(i, dmode, dtype)
 				"$alpha_unclamped"			"0.0"
 
 				"$translate"				"[0.0 0.0]"
-				"$angle" 					"0"
+				"$angle" 					"]].. overlaytextureangle ..[["
 
 				"Proxies"
 				{
@@ -2227,6 +2316,7 @@ local function CheckChanges()
 		cache.bumpmap ~= setting.bumpmap:GetValue() or
 		cache.bumpangle ~= setting.bumpangle:GetValue() or
 		cache.bumpspeed ~= setting.bumpspeed:GetValue()	or
+		cache.basetextureangle ~= setting.basetextureangle:GetValue() or
 		speedbasedchange or healthbasedchange then
 
 			RemoveDefaults()
@@ -2393,6 +2483,7 @@ local function CheckChanges()
 			cache.bumpmap = setting.bumpmap:GetValue()
 			cache.bumpangle = setting.bumpangle:GetValue()
 			cache.bumpspeed = setting.bumpspeed:GetValue()
+			cache.basetextureangle = setting.basetextureangle:GetValue()
 			if setting.speedbased ~= nil then
 				cache.speedbased = setting.speedbased:GetValue()
 			end
@@ -2412,6 +2503,7 @@ local function CheckChanges()
 		cache.overlaytexture ~= setting.overlaytexture:GetValue() or
 		cache.overlayspeed ~= setting.overlayspeed:GetValue() or
 		cache.overlayangle ~= setting.overlayangle:GetValue() or
+		cache.overlaytextureangle ~= setting.overlaytextureangle:GetValue() or
 		speedbasedoverchange then
 
 			RemoveDefaults()
@@ -2564,6 +2656,7 @@ local function CheckChanges()
 			cache.overlaytexture = setting.overlaytexture:GetValue()
 			cache.overlayspeed = setting.overlayspeed:GetValue()
 			cache.overlayangle = setting.overlayangle:GetValue()
+			cache.overlaytextureangle = setting.overlaytextureangle:GetValue()
 			if setting.speedbasedover ~= nil then
 				cache.speedbasedover = setting.speedbasedover:GetValue()
 			end
