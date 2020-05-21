@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "3.4"
+local VERSION_NUMBER = "3.5"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -83,27 +83,28 @@ end
 callbacks.Register("Draw", handleUpdates)
 
 local ref = gui.Reference("VISUALS", "CHAMS")
-local ref1 = gui.Reference("VISUALS", "CHAMS", "Friendly")
-local ref2 = gui.Reference("VISUALS", "CHAMS", "Enemy")
-local ref3 = gui.Reference("VISUALS", "CHAMS", "Local")
-local ref4 = gui.Reference("VISUALS", "CHAMS", "Backtrack")
-local ref5 = gui.Reference("VISUALS", "CHAMS", "Ghost")
-local ref6 = gui.Reference("VISUALS", "CHAMS", "Weapon")
 local menuref = gui.Reference("MENU")
-ref1:SetInvisible(1)
-ref2:SetInvisible(1)
-ref3:SetInvisible(1)
-ref4:SetInvisible(1)
-ref5:SetInvisible(1)
-ref6:SetInvisible(1)
+
+--Renaming these because there is no other way to reference a gui element if another one is called the same
+gui.Reference("VISUALS", "CHAMS", "Selection"):SetInvisible(true)
+gui.Reference("VISUALS", "CHAMS", "Model"):SetName("EModel")
+gui.Reference("VISUALS", "CHAMS", "Model"):SetName("FModel")
+gui.Reference("VISUALS", "CHAMS", "Attachments"):SetName("EAttachments")
+gui.Reference("VISUALS", "CHAMS", "Attachments"):SetName("FAttachments")
+gui.Reference("VISUALS", "CHAMS", "Ragdoll"):SetName("Enemy Ragdoll")
+gui.Reference("VISUALS", "CHAMS", "Ragdoll"):SetName("Friendly Ragdoll")
+
 local group = gui.Groupbox(ref, "", 16,16)
 local text1 = gui.Text(group, "Main selection")
-local modeswitch = gui.Combobox(group, "chams.modeswitch", "", "Enemy", "Friendly", "Local", "Viewmodel")
+local fakegroup = gui.Groupbox(ref, "", 16,16)
+local faketext1 = gui.Text(fakegroup, "Main selection")
+local modeswitch = gui.Combobox(group, "chams.modeswitch", "", "Enemy", "Friendly", "Local", "Viewmodel", "Other")
+local fakemodeswitch = gui.Combobox(fakegroup, "chams.fakemodeswitch", "", "Enemy", "Friendly", "Local", "Viewmodel", "Other")
 local typeswitchenemy = gui.Combobox(group, "chams.typeswitchenemy", "", "Model", "Attachment", "Backtrack")
 local typeswitchlocal = gui.Combobox(group, "chams.typeswitchlocal", "", "Model", "Attachment", "Ghost")
 local typeswitch = gui.Combobox(group, "chams.typeswitch", "", "Model", "Attachment")
 local typeswitchvm = gui.Combobox(group, "chams.typeswitchvm", "", "Arms", "Sleeves", "Weapon")
-local visswitch = gui.Combobox(group, "chams.visswitch", "", "Visible", "Invisible")
+local visswitch = gui.Combobox(group, "chams.visswitch", "", "Visible", "Occluded")
 local advancedcheck = gui.Checkbox(group, "chams.advancedmode", "", 0)
 local text2 = gui.Text(group, "Advanced Mode")
 local advancedgroup = gui.Groupbox(ref, "", 16, 155)
@@ -117,6 +118,10 @@ text1:SetPosY(-25)
 modeswitch:SetWidth(125)
 modeswitch:SetPosX(100)
 modeswitch:SetPosY(-50)
+faketext1:SetPosY(-25)
+fakemodeswitch:SetWidth(125)
+fakemodeswitch:SetPosX(100)
+fakemodeswitch:SetPosY(-50)
 typeswitch:SetWidth(125)
 typeswitch:SetPosX(235)
 typeswitch:SetPosY(-50)
@@ -170,6 +175,84 @@ scopeblendslider:SetWidth(264)
 scopeblendslider:SetPosX(316)
 scopeblendslider:SetPosY(-25)
 
+local glowgroup = gui.Groupbox(ref, "Glow", 16,880)
+local enemyglow = gui.Combobox(glowgroup, "chams.enemyglow", "Enemy", "Off", "Color", "Health")
+local enemyglowclr = gui.ColorPicker(enemyglow, "enemy.enemyglow.clr", "", 255, 255, 255, 255 )
+local friendglow = gui.Combobox(glowgroup, "chams.friendglow", "Friendly", "Off", "Color", "Health")
+local friendglowclr = gui.ColorPicker(friendglow, "enemy.friendglow.clr", "", 255, 255, 255, 255 )
+local localglow = gui.Combobox(glowgroup, "chams.localglow", "Local", "Off", "Color", "Health")
+local localglowclr = gui.ColorPicker(localglow, "enemy.localglow.clr", "", 255, 255, 255, 255 )
+enemyglow:SetWidth(175)
+-- enemyglowclr:SetPosY(0)
+enemyglowclr:SetPosX(150)
+friendglow:SetWidth(175)
+friendglow:SetPosX(200)
+friendglow:SetPosY(0)
+friendglowclr:SetPosX(350)
+localglow:SetWidth(175)
+localglow:SetPosX(400)
+localglow:SetPosY(0)
+localglowclr:SetPosX(550)
+gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetPosY(480)
+gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetPosY(680)
+
+local glowtable = {
+	enemy = {
+		setting = nil,
+		color = {r = nil, g = nil, b = nil, a = nil}
+	},
+	friend = {
+		setting = nil,
+		color = {r = nil, g = nil, b = nil, a = nil}
+	},
+	loc = {
+		setting = nil,
+		color = {r = nil, g = nil, b = nil, a = nil}
+	}
+}
+
+enemyglow:SetValue(gui.GetValue("esp.chams.enemy.glow"))
+glowtable.enemy.setting = gui.GetValue("esp.chams.enemy.glow")
+enemyglowclr:SetValue(gui.GetValue("esp.chams.enemy.glow.clr"))
+glowtable.enemy.color.r, glowtable.enemy.color.g, glowtable.enemy.color.b, glowtable.enemy.color.a = gui.GetValue("esp.chams.enemy.glow.clr")
+friendglow:SetValue(gui.GetValue("esp.chams.friendly.glow"))
+glowtable.friend.setting = gui.GetValue("esp.chams.friendly.glow")
+friendglowclr:SetValue(gui.GetValue("esp.chams.friendly.glow.clr"))
+glowtable.friend.color.r, glowtable.friend.color.g, glowtable.friend.color.b, glowtable.friend.color.a = gui.GetValue("esp.chams.friendly.glow.clr")
+localglow:SetValue(gui.GetValue("esp.chams.local.glow"))
+glowtable.loc.setting = gui.GetValue("esp.chams.local.glow")
+localglowclr:SetValue(gui.GetValue("esp.chams.local.glow.clr"))
+glowtable.loc.color.r, glowtable.loc.color.g, glowtable.loc.color.b, glowtable.loc.color.a = gui.GetValue("esp.chams.local.glow.clr")
+
+--Shitty fix but aimware sets chams tab elements to visible when the tab is first opened.
+--This is the only way to make it work properly without having to open the chams tab before loading the lua.
+local function HideDefaultMenu()
+	if menuref:IsActive() then
+		gui.Reference("VISUALS", "CHAMS", "EModel"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "FModel"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Model"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "EAttachments"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "FAttachments"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Attachments"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Backtrack"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Viewmodel Weapon"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Viewmodel Arms"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Ghost"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Weapon"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(true)
+		if modeswitch:GetValue() == 4 then
+			gui.Reference("VISUALS", "CHAMS", "Weapon"):SetInvisible(false)
+			gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(false)
+			gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetInvisible(false)
+			gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetInvisible(false)
+		end
+	end
+end
+
+callbacks.Register("Draw", HideDefaultMenu)
+
 local lp = nil
 
 local IsScoped, HeldWeapon, Modulated = nil, nil, false
@@ -188,15 +271,39 @@ local function RemoveDefaults()
 	gui.SetValue("esp.chams.enemy.occluded", 0)
 	gui.SetValue("esp.chams.enemy.visible", 0)
 	gui.SetValue("esp.chams.enemy.overlay", 0)
+	gui.SetValue("esp.chams.enemyattachments.occluded", 0)
+	gui.SetValue("esp.chams.enemyattachments.visible", 0)
+	gui.SetValue("esp.chams.enemyattachments.overlay", 0)
+	-- gui.SetValue("esp.chams.enemyragdoll.occluded", 0)
+	-- gui.SetValue("esp.chams.enemyragdoll.visible", 0)
+	-- gui.SetValue("esp.chams.enemyragdoll.overlay", 0)
 	gui.SetValue("esp.chams.friendly.occluded", 0)
 	gui.SetValue("esp.chams.friendly.visible", 0)
 	gui.SetValue("esp.chams.friendly.overlay", 0)
+	gui.SetValue("esp.chams.friendlyattachments.occluded", 0)
+	gui.SetValue("esp.chams.friendlyattachments.visible", 0)
+	gui.SetValue("esp.chams.friendlyattachments.overlay", 0)
+	-- gui.SetValue("esp.chams.friendlyragdoll.occluded", 0)
+	-- gui.SetValue("esp.chams.friendlyragdoll.visible", 0)
+	-- gui.SetValue("esp.chams.friendlyragdoll.overlay", 0)
 	gui.SetValue("esp.chams.local.occluded", 0)
 	gui.SetValue("esp.chams.local.visible", 0)
 	gui.SetValue("esp.chams.local.overlay", 0)
-	gui.SetValue("esp.chams.weapon.occluded", 0)
-	gui.SetValue("esp.chams.weapon.visible", 0)
-	gui.SetValue("esp.chams.weapon.overlay", 0)
+	gui.SetValue("esp.chams.localweapon.occluded", 0)
+	gui.SetValue("esp.chams.localweapon.visible", 0)
+	gui.SetValue("esp.chams.localweapon.overlay", 0)
+	gui.SetValue("esp.chams.localarms.occluded", 0)
+	gui.SetValue("esp.chams.localarms.visible", 0)
+	gui.SetValue("esp.chams.localarms.overlay", 0)
+	gui.SetValue("esp.chams.localattachments.occluded", 0)
+	gui.SetValue("esp.chams.localattachments.visible", 0)
+	gui.SetValue("esp.chams.localattachments.overlay", 0)
+	-- gui.SetValue("esp.chams.weapon.occluded", 0)
+	-- gui.SetValue("esp.chams.weapon.visible", 0)
+	-- gui.SetValue("esp.chams.weapon.overlay", 0)
+	-- gui.SetValue("esp.chams.nades.occluded", 0)
+	-- gui.SetValue("esp.chams.nades.visible", 0)
+	-- gui.SetValue("esp.chams.nades.overlay", 0)
 	gui.SetValue("esp.chams.backtrack.occluded", 0)
 	gui.SetValue("esp.chams.backtrack.visible", 0)
 	gui.SetValue("esp.chams.backtrack.overlay", 0)
@@ -1475,7 +1582,7 @@ local cached = {
 	}
 }
 
-local lastmode, lasttype, lastvis, lasttypevm, lasttypeenemy, lasttypelocal, lastbase, lastoverlay, lastadvanced, lastblend = nil, nil, nil, nil, nil, nil, nil, nil, nil, nil
+local lastmode, lastfakemode, lasttype, lastvis, lasttypevm, lasttypeenemy, lasttypelocal, lastbase, lastoverlay, lastadvanced, lastblend = nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil
 local selectedmode, selectedtype, selectedvis, modename, typename, basemode, overlaymode = nil, nil, nil, nil, nil, nil, nil
 
 local function SetSelections()
@@ -1621,29 +1728,29 @@ SetupMenu()
 
 local function HideSettings(i)
 	if selectedmode == 3 then
-		typeswitchvm:SetInvisible(0)
-		typeswitch:SetInvisible(1)
-		typeswitchenemy:SetInvisible(1)
-		typeswitchlocal:SetInvisible(1)
-		visswitch:SetInvisible(1)
+		typeswitchvm:SetInvisible(false)
+		typeswitch:SetInvisible(true)
+		typeswitchenemy:SetInvisible(true)
+		typeswitchlocal:SetInvisible(true)
+		visswitch:SetInvisible(true)
 	elseif selectedmode == 0 then
-		typeswitchvm:SetInvisible(1)
-		typeswitch:SetInvisible(1)
-		typeswitchenemy:SetInvisible(0)
-		typeswitchlocal:SetInvisible(1)
-		visswitch:SetInvisible(0)
+		typeswitchvm:SetInvisible(true)
+		typeswitch:SetInvisible(true)
+		typeswitchenemy:SetInvisible(false)
+		typeswitchlocal:SetInvisible(true)
+		visswitch:SetInvisible(false)
 	elseif selectedmode == 2 then
-		typeswitchvm:SetInvisible(1)
-		typeswitch:SetInvisible(1)
-		typeswitchenemy:SetInvisible(1)
-		typeswitchlocal:SetInvisible(0)
-		visswitch:SetInvisible(0)
+		typeswitchvm:SetInvisible(true)
+		typeswitch:SetInvisible(true)
+		typeswitchenemy:SetInvisible(true)
+		typeswitchlocal:SetInvisible(false)
+		visswitch:SetInvisible(false)
 	else
-		typeswitchvm:SetInvisible(1)
-		typeswitch:SetInvisible(0)
-		typeswitchenemy:SetInvisible(1)
-		typeswitchlocal:SetInvisible(1)
-		visswitch:SetInvisible(0)
+		typeswitchvm:SetInvisible(true)
+		typeswitch:SetInvisible(false)
+		typeswitchenemy:SetInvisible(true)
+		typeswitchlocal:SetInvisible(true)
+		visswitch:SetInvisible(false)
 	end
 	if i == 1 then
 		for mode, types in pairs(settings) do
@@ -1851,12 +1958,30 @@ local function HideSettings(i)
 			settings[modename][typename]["overlaytextureangle"]:SetDisabled(true)
 			overlaytext:SetDisabled(true)
 		end
+	elseif i == 4 then
+		group:SetInvisible(false)
+		scopeblendgroup:SetInvisible(false)
+		if advancedcheck:GetValue() then
+			advancedgroup:SetInvisible(false)
+		end
+		fakegroup:SetInvisible(true)
+		glowgroup:SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Weapon"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetInvisible(true)
+	elseif i == 5 then
+		group:SetInvisible(true)
+		fakegroup:SetInvisible(false)
+		advancedgroup:SetInvisible(true)
+		scopeblendgroup:SetInvisible(true)
+		glowgroup:SetInvisible(false)
+		gui.Reference("VISUALS", "CHAMS", "Weapon"):SetInvisible(false)
+		gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(false)
+		gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetInvisible(false)
+		gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetInvisible(false)
 	end
 end
-
-HideSettings(1)
-HideSettings(2)
-HideSettings(3)
 
 local function DispatchMaterial(i, dmode, dtype)
 	if i == 1 then
@@ -2179,28 +2304,40 @@ local function MenuHandler()
 
 	if lastadvanced ~= advancedcheck:GetValue() then
 		if advancedcheck:GetValue() then
-			advancedgroup:SetInvisible(0)
+			advancedgroup:SetInvisible(false)
 			HideSettings(2)
 			HideSettings(3)
 		else
-			advancedgroup:SetInvisible(1)
+			advancedgroup:SetInvisible(true)
 			HideSettings(2)
 			HideSettings(3)
 		end
 		lastadvanced = advancedcheck:GetValue()
 	end
 
+	if lastfakemode ~= fakemodeswitch:GetValue() then
+		modeswitch:SetValue(fakemodeswitch:GetValue())
+		lastfakemode = fakemodeswitch:GetValue()
+	end
+
 	if lastmode ~= modeswitch:GetValue() or lasttype ~= typeswitch:GetValue() or lasttypevm ~= typeswitchvm:GetValue() or lasttypeenemy ~= typeswitchenemy:GetValue() or lasttypelocal ~= typeswitchlocal:GetValue() or lastvis ~= visswitch:GetValue() then
-		SetSelections()
-		HideSettings(1)
-		HideSettings(2)
-		HideSettings(3)
-		lastmode = modeswitch:GetValue()
-		lasttype = typeswitch:GetValue()
-		lasttypevm = typeswitchvm:GetValue()
-		lasttypeenemy = typeswitchenemy:GetValue()
-		lasttypelocal = typeswitchlocal:GetValue()
-		lastvis = visswitch:GetValue()
+		if modeswitch:GetValue() ~= 4 then
+			SetSelections()
+			HideSettings(4)
+			HideSettings(1)
+			HideSettings(2)
+			HideSettings(3)
+			lastmode = modeswitch:GetValue()
+			lasttype = typeswitch:GetValue()
+			lasttypevm = typeswitchvm:GetValue()
+			lasttypeenemy = typeswitchenemy:GetValue()
+			lasttypelocal = typeswitchlocal:GetValue()
+			lastvis = visswitch:GetValue()
+		else
+			HideSettings(5)
+			lastmode = modeswitch:GetValue()
+			fakemodeswitch:SetValue(4)
+		end
 	end
 	if lastbase ~= setting.base:GetValue() then
 		SetSelections()
@@ -2665,6 +2802,58 @@ local function CheckChanges()
 		end
 		end
 		end
+
+		local enemyglowr, enemyglowg, enemyglowb, enemyglowa = enemyglowclr:GetValue()
+
+		if glowtable.enemy.setting ~= enemyglow:GetValue() or
+		enemyglowr ~= glowtable.enemy.color.r or
+		enemyglowg ~= glowtable.enemy.color.g or
+		enemyglowb ~= glowtable.enemy.color.b or
+		enemyglowa ~= glowtable.enemy.color.a then
+
+			gui.SetValue("esp.chams.enemy.glow", enemyglow:GetValue())
+			gui.SetValue("esp.chams.enemy.glow.clr", enemyglowclr:GetValue())
+			glowtable.enemy.setting = enemyglow:GetValue()
+			enemyglowr = glowtable.enemy.color.r
+			enemyglowg = glowtable.enemy.color.g
+			enemyglowb = glowtable.enemy.color.b
+			enemyglowa = glowtable.enemy.color.a
+		end
+
+		local friendglowr, friendglowg, friendglowb, friendglowa = friendglowclr:GetValue()
+
+		if glowtable.friend.setting ~= friendglow:GetValue() or
+		friendglowr ~= glowtable.friend.color.r or
+		friendglowg ~= glowtable.friend.color.g or
+		friendglowb ~= glowtable.friend.color.b or
+		friendglowa ~= glowtable.friend.color.a then
+
+			gui.SetValue("esp.chams.friendly.glow", friendglow:GetValue())
+			gui.SetValue("esp.chams.friendly.glow.clr", friendglowclr:GetValue())
+			glowtable.friend.setting = friendglow:GetValue()
+			friendglowr = glowtable.friend.color.r
+			friendglowg = glowtable.friend.color.g
+			friendglowb = glowtable.friend.color.b
+			friendglowa = glowtable.friend.color.a
+		end
+
+		local localglowr, localglowg, localglowb, localglowa = localglowclr:GetValue()
+
+		if glowtable.loc.setting ~= localglow:GetValue() or
+		localglowr ~= glowtable.loc.color.r or
+		localglowg ~= glowtable.loc.color.g or
+		localglowb ~= glowtable.loc.color.b or
+		localglowa ~= glowtable.loc.color.a then
+
+			gui.SetValue("esp.chams.local.glow", localglow:GetValue())
+			gui.SetValue("esp.chams.local.glow.clr", localglowclr:GetValue())
+			glowtable.loc.setting = localglow:GetValue()
+			localglowr = glowtable.loc.color.r
+			localglowg = glowtable.loc.color.g
+			localglowb = glowtable.loc.color.b
+			localglowa = glowtable.loc.color.a
+		end
+
 	end
 end
 
@@ -3043,12 +3232,19 @@ client.AllowListener("round_start")
 callbacks.Register ("FireGameEvent", RoundStart)
 
 local function OnUnload()
-	ref1:SetInvisible(0)
-	ref2:SetInvisible(0)
-	ref3:SetInvisible(0)
-	ref4:SetInvisible(0)
-	ref5:SetInvisible(0)
-	ref6:SetInvisible(0)
+	gui.Reference("VISUALS", "CHAMS", "Selection"):SetInvisible(false)
+	gui.Reference("VISUALS", "CHAMS", "EModel"):SetName("Model")
+	gui.Reference("VISUALS", "CHAMS", "FModel"):SetName("Model")
+	gui.Reference("VISUALS", "CHAMS", "EAttachments"):SetName("Attachments")
+	gui.Reference("VISUALS", "CHAMS", "FAttachments"):SetName("Attachments")
+	gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetPosY(480)
+	gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetInvisible(true)
+	gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetName("Ragdoll")
+	gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetPosY(480)
+	gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetInvisible(true)
+	gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetName("Ragdoll")
+	gui.Reference("VISUALS", "CHAMS", "Weapon"):SetInvisible(true)
+	gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(true)
 end
 
 callbacks.Register("Unload", OnUnload)
