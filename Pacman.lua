@@ -1466,6 +1466,9 @@ local function drawing()
 
     if active:GetValue() then
         game.draw = true
+    else
+        game.draw = false
+        game.paused = true
     end
 
     if game.draw then
