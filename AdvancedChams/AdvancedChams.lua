@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "3.5"
+local VERSION_NUMBER = "3.5b"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -2299,9 +2299,6 @@ end
 
 local function MenuHandler()
 
-	local cache = cached[modename][typename]
-	local setting = settings[modename][typename]
-
 	if lastadvanced ~= advancedcheck:GetValue() then
 		if advancedcheck:GetValue() then
 			advancedgroup:SetInvisible(false)
@@ -2339,16 +2336,7 @@ local function MenuHandler()
 			fakemodeswitch:SetValue(4)
 		end
 	end
-	if lastbase ~= setting.base:GetValue() then
-		SetSelections()
-		HideSettings(2)
-		lastbase = setting.base:GetValue()
-	end
-	if lastoverlay ~= setting.overlay:GetValue() then
-		SetSelections()
-		HideSettings(3)
-		lastoverlay = setting.overlay:GetValue()
-	end
+
 	if lastblend ~= scopeblendbox:GetValue() then
 		if scopeblendbox:GetValue() then
 			scopeblendselector:SetDisabled(0)
@@ -2359,6 +2347,23 @@ local function MenuHandler()
 		end
 		lastblend = scopeblendbox:GetValue()
 	end
+
+	if modename == nil or typename == nil then return end
+
+	local setting = settings[modename][typename]
+
+	if lastbase ~= setting.base:GetValue() then
+		SetSelections()
+		HideSettings(2)
+		lastbase = setting.base:GetValue()
+	end
+
+	if lastoverlay ~= setting.overlay:GetValue() then
+		SetSelections()
+		HideSettings(3)
+		lastoverlay = setting.overlay:GetValue()
+	end
+
 end
 
 callbacks.Register("Draw", MenuHandler)
