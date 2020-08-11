@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "3.5b"
+local VERSION_NUMBER = "3.5c"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -2961,10 +2961,18 @@ local function DoScopeBlend()
 			end
 
 			if LocalVisOverMat ~= nil then
-				LocalVisOverMat:AlphaModulate(cached.loc.vis.overlayclr.a/255)
+				if cached.loc.vis.overlay == 1 or cached.loc.vis.overlay == 3 then
+					LocalVisOverMat:AlphaModulate(1)
+				else
+					LocalVisOverMat:AlphaModulate(cached.loc.vis.overlayclr.a/255)
+				end
 			end
 			if LocalIzOverMat ~= nil then
-				LocalIzOverMat:AlphaModulate(cached.loc.iz.overlayclr.a/255)
+				if cached.loc.iz.overlay == 1 or cached.loc.iz.overlay == 3 then
+					LocalIzOverMat:AlphaModulate(1)
+				else
+					LocalIzOverMat:AlphaModulate(cached.loc.iz.overlayclr.a/255)
+				end
 			end
 
 			if LocalAttVisMat ~= nil then
@@ -2979,10 +2987,18 @@ local function DoScopeBlend()
 			end
 
 			if LocalAttVisOverMat ~= nil then
-				LocalAttVisOverMat:AlphaModulate(cached.loc.attvis.overlayclr.a/255)
+				if cached.loc.attvis.overlay == 1 or cached.loc.attvis.overlay == 3 then
+					LocalAttVisOverMat:AlphaModulate(1)
+				else
+					LocalAttVisOverMat:AlphaModulate(cached.loc.attvis.overlayclr.a/255)
+				end
 			end
 			if LocalAttIzOverMat ~= nil then
-				LocalAttIzOverMat:AlphaModulate(cached.loc.attiz.overlayclr.a/255)
+				if cached.loc.attiz.overlay == 1 or cached.loc.attiz.overlay == 3 then
+					LocalAttIzOverMat:AlphaModulate(1)
+				else
+					LocalAttIzOverMat:AlphaModulate(cached.loc.attiz.overlayclr.a/255)
+				end
 			end
 
 			if GhostVisMat ~= nil then
@@ -2997,10 +3013,18 @@ local function DoScopeBlend()
 			end
 
 			if GhostVisOverMat ~= nil then
-				GhostVisOverMat:AlphaModulate(cached.loc.ghostvis.overlayclr.a/255)
+				if cached.loc.ghostvis.overlay == 1 or cached.loc.ghostvis.overlay == 3 then
+					GhostVisOverMat:AlphaModulate(1)
+				else
+					GhostVisOverMat:AlphaModulate(cached.loc.ghostvis.overlayclr.a/255)
+				end
 			end
 			if GhostIzOverMat ~= nil then
-				GhostIzOverMat:AlphaModulate(cached.loc.ghostiz.overlayclr.a/255)
+				if cached.loc.ghostiz.overlay == 1 or cached.loc.ghostiz.overlay == 3 then
+					GhostIzOverMat:AlphaModulate(1)
+				else
+					GhostIzOverMat:AlphaModulate(cached.loc.ghostiz.overlayclr.a/255)
+				end
 			end
 
 			Modulated = false
