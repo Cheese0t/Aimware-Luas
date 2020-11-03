@@ -83,6 +83,9 @@ buildboard()
 
 local function readscores()
 
+	local a = file.Open("LUA_Snake_Highscores.dat", "a")
+    a:Close()
+
 	local f = file.Open("LUA_Snake_Highscores.dat", "r")
 	if f ~= nil then
 		local scores = f:Read()

@@ -457,8 +457,10 @@ end
 
 local function readscore()
 
+	local a = file.Open("LUA_FlappyBird_HighScore.dat", "a")
+    a:Close()
+
 	local f = file.Open("LUA_FlappyBird_HighScore.dat", "r")
-	
 	if f ~= nil then	
 		local savedscore = f:Read()
 		f:Close()
