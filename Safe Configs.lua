@@ -1,5 +1,6 @@
 local configdelete = gui.Reference("Settings", "Configurations", "Manage Configurations", "Delete")
 local configreset = gui.Reference("Settings", "Configurations", "Manage Configurations", "Reset")
+local configsave = gui.Reference("Settings", "Configurations", "Manage Configurations", "Save")
 local luadelete = gui.Reference("Settings", "Lua Scripts", "Manage Scripts", "Delete")
 local menu = gui.Reference("Menu")
 
@@ -23,6 +24,7 @@ local toggled = false
 
 configdelete:SetDisabled(true)
 configreset:SetDisabled(true)
+configsave:SetDisabled(true)
 luadelete:SetDisabled(true)
 
 local function ondraw()
@@ -32,6 +34,7 @@ local function ondraw()
             luacheckbox:SetValue(true)
             configdelete:SetDisabled(false)
             configreset:SetDisabled(false)
+            configsave:SetDisabled(false)
             luadelete:SetDisabled(false)
             toggled = true
         end
@@ -40,6 +43,7 @@ local function ondraw()
             luacheckbox:SetValue(false)
             configdelete:SetDisabled(true)
             configreset:SetDisabled(true)
+            configsave:SetDisabled(true)
             luadelete:SetDisabled(true)
             toggled = false
         end
@@ -48,6 +52,7 @@ local function ondraw()
         luacheckbox:SetValue(false)
         configdelete:SetDisabled(true)
         configreset:SetDisabled(true)
+        configsave:SetDisabled(true)
         luadelete:SetDisabled(true)
         toggled = false
     end
