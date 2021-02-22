@@ -1,6 +1,7 @@
 local configdelete = gui.Reference("Settings", "Configurations", "Manage Configurations", "Delete")
 local configreset = gui.Reference("Settings", "Configurations", "Manage Configurations", "Reset")
 local configsave = gui.Reference("Settings", "Configurations", "Manage Configurations", "Save")
+local configimport = gui.Reference( "Settings", "Configurations", "Manage Configurations", "Import from Clipboard")
 local luadelete = gui.Reference("Settings", "Lua Scripts", "Manage Scripts", "Delete")
 local menu = gui.Reference("Menu")
 
