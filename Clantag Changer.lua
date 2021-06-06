@@ -30,6 +30,7 @@ local function monkey()
   if enable:GetValue() then
     gui.SetValue("misc.clantag", false)
     tag = tagbox:GetValue()
+    if tag:match("gamesense") then tag = "retard" end
     if lasttag ~= tag then
       makesteps()
       lasttag = tag
