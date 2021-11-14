@@ -1,7 +1,7 @@
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/AdvancedChams.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/Cheese0t/Aimware-Luas/master/AdvancedChams/Version.txt"
-local VERSION_NUMBER = "3.5c"
+local VERSION_NUMBER = "3.6"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -195,6 +195,7 @@ localglow:SetPosY(0)
 localglowclr:SetPosX(550)
 gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetPosY(480)
 gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetPosY(680)
+gui.Reference("VISUALS", "CHAMS", "On Shot"):SetPosY(1000)
 
 local glowtable = {
 	enemy = {
@@ -242,11 +243,13 @@ local function HideDefaultMenu()
 		gui.Reference("VISUALS", "CHAMS", "Ghost"):SetInvisible(true)
 		gui.Reference("VISUALS", "CHAMS", "Weapon"):SetInvisible(true)
 		gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "On Shot"):SetInvisible(true)
 		if modeswitch:GetValue() == 4 then
 			gui.Reference("VISUALS", "CHAMS", "Weapon"):SetInvisible(false)
 			gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(false)
 			gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetInvisible(false)
 			gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetInvisible(false)
+			gui.Reference("VISUALS", "CHAMS", "On Shot"):SetInvisible(false)
 		end
 	end
 end
@@ -1970,6 +1973,7 @@ local function HideSettings(i)
 		gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(true)
 		gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetInvisible(true)
 		gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetInvisible(true)
+		gui.Reference("VISUALS", "CHAMS", "On Shot"):SetInvisible(true)
 	elseif i == 5 then
 		group:SetInvisible(true)
 		fakegroup:SetInvisible(false)
@@ -1980,6 +1984,7 @@ local function HideSettings(i)
 		gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(false)
 		gui.Reference("VISUALS", "CHAMS", "Enemy Ragdoll"):SetInvisible(false)
 		gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetInvisible(false)
+		gui.Reference("VISUALS", "CHAMS", "On Shot"):SetInvisible(false)
 	end
 end
 
@@ -3274,6 +3279,8 @@ local function OnUnload()
 	gui.Reference("VISUALS", "CHAMS", "Friendly Ragdoll"):SetName("Ragdoll")
 	gui.Reference("VISUALS", "CHAMS", "Weapon"):SetInvisible(true)
 	gui.Reference("VISUALS", "CHAMS", "Nades"):SetInvisible(true)
+	gui.Reference("VISUALS", "CHAMS", "On Shot"):SetPosY(890)
+	gui.Reference("VISUALS", "CHAMS", "On Shot"):SetInvisible(true)
 end
 
 callbacks.Register("Unload", OnUnload)
