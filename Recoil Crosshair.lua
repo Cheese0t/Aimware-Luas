@@ -1,91 +1,90 @@
---Recoil Crosshair by Cheeseot
-local ButtonPosition = gui.Reference( "VISUALS", "Other", "Extra" );
-local PunchCheckbox = gui.Checkbox( ButtonPosition, "lua_recoilcrosshair", "Recoil Crosshair", 1 );
-local recoilcolor = gui.ColorPicker(PunchCheckbox, "recoilcolor", "Recoil Crosshair Color", 255,255,255,255)
-local IdleCheckbox = gui.Checkbox( ButtonPosition, "lua_recoilidle", "Hide Recoil Crosshair When Idle", 1 );
+--Recoil Crosshair by Cheeseot and contributors
 
-local function punch()
+local refExtra = gui.Reference("VISUALS", "Other", "Extra");
+local settingGroup = gui.Groupbox(refExtra, "Custom Recoil Crosshair", 296, 220, 296, 0);
+local settingEnable = gui.Checkbox(settingGroup, "lua_recoilcrosshair", "Enable", false);
+local settingColor = gui.ColorPicker(settingEnable, "color", "", 255, 0, 0, 255);
+local settingIngame = gui.Checkbox(settingGroup, "lua_recoilcrosshair_ingame", "Use in-game crosshair", false);
 
-local rifle = 0;
-local me = entities.GetLocalPlayer();
-if me ~= nil and not gui.GetValue("rbot.master") then
-    if me:IsAlive() then
-    local scoped = me:GetProp("m_bIsScoped");
-    if scoped == 256 then scoped = 0 end
-    if scoped == 257 then scoped = 1 end
-    local my_weapon = me:GetPropEntity("m_hActiveWeapon");
-    if my_weapon ~=nil then
-        local weapon_name = my_weapon:GetClass();
-        local canDraw = 0;
-        local snipercrosshair = 0;
-        weapon_name = string.gsub(weapon_name, "CWeapon", "");
-        if weapon_name == "Aug" or weapon_name == "SG556" then
-            rifle = 1;
-            else
-            rifle = 0;
-            end
+callbacks.Register("CreateMove", function()
+	local value = (not gui.GetValue("rbot.master") and settingEnable:GetValue() and settingIngame:GetValue()) and 1 or 0; 
+	client.SetConVar("cl_crosshair_recoil", value, true);
+end);
 
-        if scoped == 0 or (scoped == 1 and rifle == 1) then
-            canDraw = 1;
-            else
-            canDraw = 0;
-            end
-
-        if weapon_name == "Taser" or weapon_name == "CKnife" then
-            canDraw = 0;
-            end
-
-        if weapon_name == "AWP" or weapon_name == "SCAR20" or weapon_name == "G3SG1"  or weapon_name == "SSG08" then
-            snipercrosshair = 1;
-            end
-
-    --Recoil Crosshair by Cheeseot
-
-        if PunchCheckbox:GetValue() and canDraw == 1 then
-            local punchAngleVec = me:GetPropVector("localdata", "m_Local", "m_aimPunchAngle");
-            local punchAngleX, punchAngleY = punchAngleVec.x, punchAngleVec.y
-            local w, h = draw.GetScreenSize();
-            local x = w / 2;
-            local y = h / 2;
-            local fov = 90 --gui.GetValue("vis_view_fov");      polak pls add this back
-
-            if fov == 0 then
-                fov = 90;
-                end
-            if scoped == 1 and rifle == 1 then
-                fov = 45;
-                end
-            
-            local dx = w / fov;
-            local dy = h / fov;
-			
-			local px = 0
-			local py = 0
-			
-            if gui.GetValue("esp.other.norecoil") then
-				px = x - (dx * punchAngleY)*1.2;
-				py = y + (dy * punchAngleX)*2;
-            else
-				px = x - (dx * punchAngleY)*0.6;
-				py = y + (dy * punchAngleX);
-			end
-            
-            if px > x-0.5 and px < x then px = x end
-            if px < x+0.5 and px > x then px = x end
-            if py > y-0.5 and py < y then py = y end
-            if py < y+0.5 and py > y then py = y end
-
-			if IdleCheckbox:GetValue() then
-            if px == x and py == y and snipercrosshair ~=1 then return; end
-			end
-				
-            draw.Color(recoilcolor:GetValue());
-            draw.FilledRect(px-3, py-1, px+3, py+1);
-            draw.FilledRect(px-1, py-3, px+1, py+3);
-            end
-        end
-    end
-    end
+local function GetIneyesPlayer()
+	local localPlayer = entities.GetLocalPlayer();
+	if not localPlayer then
+		return nil;
+	end
+	
+	if not localPlayer:IsAlive() then
+		local obsTarget = localPlayer:GetPropEntity("m_hObserverTarget");
+		if not obsTarget or not obsTarget:IsPlayer() then
+			return nil;
+		end
+		return obsTarget;
+	end
+	
+	return localPlayer;
 end
-callbacks.Register("Draw", "punch", punch);
---Recoil Crosshair by Cheeseot
+
+-- locals are faster than globals
+-- https://lua-users.org/wiki/OptimisingUsingLocalVariables
+local math_tan = math.tan
+local math_rad = math.rad
+local math_sin = math.sin
+
+callbacks.Register("Draw", function()
+	if gui.GetValue("rbot.master") or not settingEnable:GetValue() then
+		return;
+	end
+
+	local localPlayer = entities.GetLocalPlayer();
+	local player = GetIneyesPlayer();
+	if not localPlayer or (not player or not player:IsAlive()) or
+		(settingIngame:GetValue() and not player:GetPropBool("m_bIsScoped")) then
+		return;
+	end
+	
+	local activeWeapon = player:GetPropEntity("m_hActiveWeapon");
+	if not activeWeapon or activeWeapon:GetPropFloat("m_flRecoilIndex") <= 1 then
+		return;
+	end
+	
+	local weaponType = activeWeapon:GetWeaponType();
+	if 1 > weaponType or weaponType > 6 or weaponType == 4 or weaponType == 5 then
+		return;
+	end
+	
+	local fov = player:GetPropInt("m_iFOV");
+	if fov <= 0 then
+		fov = player:GetPropInt("m_iDefaultFOV");
+	end
+	
+	local punchAngle = localPlayer:GetPropVector("localdata", "m_Local", "m_aimPunchAngle");
+	local screenW, screenH = draw.GetScreenSize();
+	local centerX = screenW * 0.5;
+	local centerY = screenH * 0.5;
+	
+	local VIEWPUNCH_COMPENSATE_MAGIC_SCALAR = 0.65;
+	if gui.GetValue("esp.other.norecoil") then
+		VIEWPUNCH_COMPENSATE_MAGIC_SCALAR = 
+			VIEWPUNCH_COMPENSATE_MAGIC_SCALAR * tonumber(client.GetConVar("weapon_recoil_scale"));
+	end
+	
+	-- https://github.com/perilouswithadollarsign/cstrike15_src/blob/master/game/shared/cstrike15/weapon_csbase.cpp#L2109
+	local flAngleToScreenPixel = VIEWPUNCH_COMPENSATE_MAGIC_SCALAR * 2 * ( screenH / ( 2.0 * math_tan( math_rad( fov ) * 0.5 ) ) );
+	local recoilX = centerX - ( flAngleToScreenPixel * math_sin( math_rad( punchAngle.y ) ) );
+	local recoilY = centerY + ( flAngleToScreenPixel * math_sin( math_rad( punchAngle.x ) ) );
+	
+	local diffX = recoilX - centerX;
+	local diffY = recoilY - centerY;
+	
+	if (5 > diffX and diffX > -5) and (5 > diffY and diffY > -5) then
+		return;
+	end
+	
+	draw.Color(settingColor:GetValue());
+	draw.FilledRect(recoilX - 3, recoilY - 1, recoilX + 3, recoilY + 1);
+	draw.FilledRect(recoilX - 1, recoilY - 3, recoilX + 1, recoilY + 3);
+end);
