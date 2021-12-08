@@ -1,7 +1,5 @@
 -- Recoil Crosshair by Cheeseot and contributors
 
-local refRagebotEnable = gui.Reference("Ragebot", "Master Switch")
-local refNoRecoil = gui.Reference("Visuals", "Other", "Effects", "Effects Removal", "No Recoil")
 local refExtra = gui.Reference("Visuals", "Other", "Extra")
 local settingGroup = gui.Groupbox(refExtra, "Custom Recoil Crosshair", 296, 220, 296, 0)
 local settingEnable = gui.Checkbox(settingGroup, "lua_recoilcrosshair", "Enable", true)
@@ -17,7 +15,7 @@ local tonumber = tonumber
 
 callbacks.Register("CreateMove", function()
 	-- don't enable in-game recoil crosshair when ragebot is enabled or using no recoil
-	local value = (not refRagebotEnable:GetValue() and not refNoRecoil:GetValue() and 
+	local value = (not gui.GetValue("rbot.master") and not gui.GetValue("esp.other.norecoil") and 
 		settingEnable:GetValue() and settingIngame:GetValue()) and 1 or 0
 
 	client.SetConVar("cl_crosshair_recoil", value, true)
@@ -46,11 +44,11 @@ local WEAPONTYPE_SNIPER_RIFLE = 5
 local WEAPONTYPE_MACHINEGUN = 6
 
 callbacks.Register("Draw", function()
-	if refRagebotEnable:GetValue() or not settingEnable:GetValue() then
+	if gui.GetValue("rbot.master") or not settingEnable:GetValue() then
 		return
 	end
 	
-	local noRecoil = refNoRecoil:GetValue()
+	local noRecoil = gui.GetValue("esp.other.norecoil")
 	
 	local localPlayer = entities.GetLocalPlayer()
 	local player = GetIneyesPlayer()
