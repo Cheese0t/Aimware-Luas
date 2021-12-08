@@ -1,14 +1,23 @@
 -- Recoil Crosshair by Cheeseot and contributors
 
+local refRagebotEnable = gui.Reference("Ragebot", "Master Switch")
+local refNoRecoil = gui.Reference("Visuals", "Other", "Effects", "Effects Removal", "No Recoil")
 local refExtra = gui.Reference("Visuals", "Other", "Extra")
 local settingGroup = gui.Groupbox(refExtra, "Custom Recoil Crosshair", 296, 220, 296, 0)
 local settingEnable = gui.Checkbox(settingGroup, "lua_recoilcrosshair", "Enable", true)
 local settingColor = gui.ColorPicker(settingEnable, "color", "", 255, 0, 0, 255)
 local settingIngame = gui.Checkbox(settingGroup, "lua_recoilcrosshair.ingame", "Use in-game crosshair", true)
 
+-- optimization, locals are faster than globals
+-- https://lua-users.org/wiki/OptimisingUsingLocalVariables
+local math_tan = math.tan
+local math_rad = math.rad
+local math_sin = math.sin
+local tonumber = tonumber
+
 callbacks.Register("CreateMove", function()
 	-- don't enable in-game recoil crosshair when ragebot is enabled or using no recoil
-	local value = (not gui.GetValue("rbot.master") and not gui.GetValue("esp.other.norecoil") and 
+	local value = (not refRagebotEnable:GetValue() and not refNoRecoil:GetValue() and 
 		settingEnable:GetValue() and settingIngame:GetValue()) and 1 or 0
 
 	client.SetConVar("cl_crosshair_recoil", value, true)
@@ -31,24 +40,17 @@ local function GetIneyesPlayer()
 	return obsTarget
 end
 
--- locals are faster than globals
--- https://lua-users.org/wiki/OptimisingUsingLocalVariables
-local math_tan = math.tan
-local math_rad = math.rad
-local math_sin = math.sin
-local tonumber = tonumber
-
 local WEAPONTYPE_PISTOL = 1
 local WEAPONTYPE_SHOTGUN = 4
 local WEAPONTYPE_SNIPER_RIFLE = 5
 local WEAPONTYPE_MACHINEGUN = 6
 
 callbacks.Register("Draw", function()
-	if gui.GetValue("rbot.master") or not settingEnable:GetValue() then
+	if refRagebotEnable:GetValue() or not settingEnable:GetValue() then
 		return
 	end
 	
-	local noRecoil = gui.GetValue("esp.other.norecoil")
+	local noRecoil = refNoRecoil:GetValue()
 	
 	local localPlayer = entities.GetLocalPlayer()
 	local player = GetIneyesPlayer()
