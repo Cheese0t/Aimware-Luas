@@ -6,6 +6,9 @@ local settingEnable = gui.Checkbox(settingGroup, "lua_recoilcrosshair", "Enable"
 local settingColor = gui.ColorPicker(settingEnable, "color", "", 255, 0, 0, 255)
 local settingIngame = gui.Checkbox(settingGroup, "lua_recoilcrosshair.ingame", "Use in-game crosshair", true)
 
+local varNameRbotEnable = "rbot.master"
+local varNameNoRecoil = "esp.other.norecoil"
+
 -- optimization, locals are faster than globals
 -- https://lua-users.org/wiki/OptimisingUsingLocalVariables
 local math_tan = math.tan
@@ -15,7 +18,7 @@ local tonumber = tonumber
 
 callbacks.Register("CreateMove", function()
 	-- don't enable in-game recoil crosshair when ragebot is enabled or using no recoil
-	local value = (not gui.GetValue("rbot.master") and not gui.GetValue("esp.other.norecoil") and 
+	local value = (not gui.GetValue(varNameRbotEnable) and not gui.GetValue(varNameNoRecoil) and
 		settingEnable:GetValue() and settingIngame:GetValue()) and 1 or 0
 
 	client.SetConVar("cl_crosshair_recoil", value, true)
@@ -44,12 +47,12 @@ local WEAPONTYPE_SNIPER_RIFLE = 5
 local WEAPONTYPE_MACHINEGUN = 6
 
 callbacks.Register("Draw", function()
-	if gui.GetValue("rbot.master") or not settingEnable:GetValue() then
+	if gui.GetValue(varNameRbotEnable) or not settingEnable:GetValue() then
 		return
 	end
-	
-	local noRecoil = gui.GetValue("esp.other.norecoil")
-	
+
+	local noRecoil = gui.GetValue(varNameNoRecoil)
+
 	local localPlayer = entities.GetLocalPlayer()
 	local player = GetIneyesPlayer()
 	-- if localPlayer is nil then player:IsAlive is nil too
@@ -65,8 +68,8 @@ callbacks.Register("Draw", function()
 	end
 
 	local weaponType = activeWeapon:GetWeaponType()
-	if WEAPONTYPE_PISTOL > weaponType or weaponType > WEAPONTYPE_MACHINEGUN or 
-		weaponType == WEAPONTYPE_SHOTGUN or 
+	if WEAPONTYPE_PISTOL > weaponType or weaponType > WEAPONTYPE_MACHINEGUN or
+		weaponType == WEAPONTYPE_SHOTGUN or
 		weaponType == WEAPONTYPE_SNIPER_RIFLE then
 		return
 	end
