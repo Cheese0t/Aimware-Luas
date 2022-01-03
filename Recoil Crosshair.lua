@@ -16,14 +16,6 @@ local math_rad = math.rad
 local math_sin = math.sin
 local tonumber = tonumber
 
-callbacks.Register("CreateMove", function()
-	-- don't enable in-game recoil crosshair when ragebot is enabled or using no recoil
-	local value = (not gui.GetValue(varNameRbotEnable) and not gui.GetValue(varNameNoRecoil) and
-		settingEnable:GetValue() and settingIngame:GetValue()) and 1 or 0
-
-	client.SetConVar("cl_crosshair_recoil", value, true)
-end)
-
 local function GetIneyesPlayer()
 	local localPlayer = entities.GetLocalPlayer()
 	if not localPlayer then
@@ -45,6 +37,14 @@ local WEAPONTYPE_PISTOL = 1
 local WEAPONTYPE_SHOTGUN = 4
 local WEAPONTYPE_SNIPER_RIFLE = 5
 local WEAPONTYPE_MACHINEGUN = 6
+
+callbacks.Register("CreateMove", function()
+	-- don't enable in-game recoil crosshair when ragebot is enabled or using no recoil
+	local value = (not gui.GetValue(varNameRbotEnable) and not gui.GetValue(varNameNoRecoil) and
+		settingEnable:GetValue() and settingIngame:GetValue()) and 1 or 0
+
+	client.SetConVar("cl_crosshair_recoil", value, true)
+end)
 
 callbacks.Register("Draw", function()
 	if gui.GetValue(varNameRbotEnable) or not settingEnable:GetValue() then
