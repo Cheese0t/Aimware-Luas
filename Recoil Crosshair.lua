@@ -1,23 +1,30 @@
 -- Recoil Crosshair by Cheeseot and contributors
 
-local refExtra = gui.Reference("Visuals", "Other", "Extra")
-local settingGroup = gui.Groupbox(refExtra, "Custom Recoil Crosshair", 296, 220, 296, 0)
-local settingEnable = gui.Checkbox(settingGroup, "lua_recoilcrosshair", "Enable", true)
-local settingColor = gui.ColorPicker(settingEnable, "color", "", 255, 0, 0, 255)
-local settingIngame = gui.Checkbox(settingGroup, "lua_recoilcrosshair.ingame", "Use in-game crosshair", true)
-
-local varNameRbotEnable = "rbot.master"
-local varNameNoRecoil = "esp.other.norecoil"
-
 -- optimization, locals are faster than globals
 -- https://lua-users.org/wiki/OptimisingUsingLocalVariables
 local math_tan = math.tan
 local math_rad = math.rad
 local math_sin = math.sin
 local tonumber = tonumber
+local entities_GetLocalPlayer = entities.GetLocalPlayer
+local gui_GetValue = gui.GetValue
+local client_SetConVar = client.SetConVar
+local client_GetConVar = client.GetConVar
+local draw_GetScreenSize = draw.GetScreenSize
+local draw_Color = draw.Color
+local draw_FilledRect = draw.FilledRect
 
-local function GetIneyesPlayer()
-	local localPlayer = entities.GetLocalPlayer()
+local refExtra = gui.Reference("Visuals", "Other", "Extra")
+local settingGroup = gui.Groupbox(refExtra, "Recoil Crosshair", 296, 220, 296, 0)
+local settingEnable = gui.Checkbox(settingGroup, "lua_recoilcrosshair", "Enable", false)
+local settingCustom = gui.Checkbox(settingGroup, "lua_recoilcrosshair.custom", "Custom crosshair", false)
+local settingColor = gui.ColorPicker(settingCustom, "color", "", 255, 0, 0, 255)
+
+local varNameRbotEnable = "rbot.master"
+local varNameNoRecoil = "esp.other.norecoil"
+
+local function GetIneyePlayer()
+	local localPlayer = entities_GetLocalPlayer()
 	if not localPlayer then
 		return nil
 	end
@@ -40,29 +47,29 @@ local WEAPONTYPE_MACHINEGUN = 6
 
 callbacks.Register("CreateMove", function()
 	-- don't enable in-game recoil crosshair when ragebot is enabled or using no recoil
-	local value = (not gui.GetValue(varNameRbotEnable) and not gui.GetValue(varNameNoRecoil) and
-		settingEnable:GetValue() and settingIngame:GetValue()) and 1 or 0
+	local value = (not gui_GetValue(varNameRbotEnable) and not gui_GetValue(varNameNoRecoil) and
+		settingEnable:GetValue() and not settingCustom:GetValue()) and 1 or 0
 
-	client.SetConVar("cl_crosshair_recoil", value, true)
+	client_SetConVar("cl_crosshair_recoil", value, true)
 end)
 
 callbacks.Register("Draw", function()
-	if gui.GetValue(varNameRbotEnable) or not settingEnable:GetValue() then
+	if gui_GetValue(varNameRbotEnable) or not settingEnable:GetValue() then
 		return
 	end
 
-	local noRecoil = gui.GetValue(varNameNoRecoil)
+	local noVisRecoil = gui_GetValue(varNameNoRecoil)
 
-	local localPlayer = entities.GetLocalPlayer()
-	local player = GetIneyesPlayer()
-	-- if localPlayer is nil then player:IsAlive is nil too
-	-- draw recoil crosshair when using no recoil or when using ingame crosshair but scoped
-	if not localPlayer or (not player or not player:IsAlive()) or
-		(not noRecoil and settingIngame:GetValue() and not player:GetPropBool("m_bIsScoped")) then
+	local localPlayer = entities_GetLocalPlayer()
+	local ineyePlayer = GetIneyePlayer()
+	-- if localPlayer is nil then ineyePlayer is nil too
+	-- draw recoil crosshair when using no visual recoil or when using ingame crosshair and scoped
+	if not localPlayer or (not ineyePlayer or not ineyePlayer:IsAlive()) or
+		(not noVisRecoil and not settingCustom:GetValue() and not ineyePlayer:GetPropBool("m_bIsScoped")) then
 		return
 	end
 
-	local activeWeapon = player:GetPropEntity("m_hActiveWeapon")
+	local activeWeapon = ineyePlayer:GetPropEntity("m_hActiveWeapon")
 	if not activeWeapon or activeWeapon:GetPropFloat("m_flRecoilIndex") <= 1 then
 		return
 	end
@@ -74,20 +81,20 @@ callbacks.Register("Draw", function()
 		return
 	end
 
-	local fov = player:GetPropInt("m_iFOV")
+	local fov = ineyePlayer:GetPropInt("m_iFOV")
 	if fov <= 0 then
-		fov = player:GetPropInt("m_iDefaultFOV")
+		fov = ineyePlayer:GetPropInt("m_iDefaultFOV")
 	end
 
 	local punchAngle = localPlayer:GetPropVector("localdata", "m_Local", "m_aimPunchAngle")
-	local screenW, screenH = draw.GetScreenSize()
+	local screenW, screenH = draw_GetScreenSize()
 	local centerX = screenW * 0.5
 	local centerY = screenH * 0.5
 
 	local VIEWPUNCH_COMPENSATE_MAGIC_SCALAR = 0.65
-	if noRecoil then
+	if noVisRecoil then
 		VIEWPUNCH_COMPENSATE_MAGIC_SCALAR =
-			VIEWPUNCH_COMPENSATE_MAGIC_SCALAR * tonumber(client.GetConVar("weapon_recoil_scale"))
+			VIEWPUNCH_COMPENSATE_MAGIC_SCALAR * tonumber(client_GetConVar("weapon_recoil_scale"))
 	end
 
 	-- https://github.com/perilouswithadollarsign/cstrike15_src/blob/master/game/shared/cstrike15/weapon_csbase.cpp#L2109
@@ -102,7 +109,7 @@ callbacks.Register("Draw", function()
 		return
 	end
 
-	draw.Color(settingColor:GetValue())
-	draw.FilledRect(recoilX - 3, recoilY - 1, recoilX + 3, recoilY + 1)
-	draw.FilledRect(recoilX - 1, recoilY - 3, recoilX + 1, recoilY + 3)
+	draw_Color(settingColor:GetValue())
+	draw_FilledRect(recoilX - 3, recoilY - 1, recoilX + 3, recoilY + 1)
+	draw_FilledRect(recoilX - 1, recoilY - 3, recoilX + 1, recoilY + 3)
 end)
