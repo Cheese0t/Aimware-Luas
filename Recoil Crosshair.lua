@@ -15,10 +15,8 @@ local draw_Color = draw.Color
 local draw_FilledRect = draw.FilledRect
 
 local refExtra = gui.Reference("Visuals", "Other", "Extra")
-local settingGroup = gui.Groupbox(refExtra, "Recoil Crosshair", 296, 220, 296, 0)
-local settingEnable = gui.Checkbox(settingGroup, "lua_recoilcrosshair", "Enable", false)
-local settingCustom = gui.Checkbox(settingGroup, "lua_recoilcrosshair.custom", "Custom crosshair", false)
-local settingColor = gui.ColorPicker(settingCustom, "color", "", 255, 0, 0, 255)
+local settingCombobox = gui.Combobox(refExtra, "lua_recoilcrosshair", "Recoil Crosshair", "Off", "In-game", "Custom")
+local settingColor = gui.ColorPicker(settingCombobox, "color", "", 255, 0, 0, 255)
 
 local varNameRbotEnable = "rbot.master"
 local varNameNoRecoil = "esp.other.norecoil"
@@ -47,14 +45,16 @@ local WEAPONTYPE_MACHINEGUN = 6
 
 callbacks.Register("CreateMove", function()
 	-- don't enable in-game recoil crosshair when ragebot is enabled or using no recoil
-	local value = (not gui_GetValue(varNameRbotEnable) and not gui_GetValue(varNameNoRecoil) and
-		settingEnable:GetValue() and not settingCustom:GetValue()) and 1 or 0
+	local value = (not gui_GetValue(varNameRbotEnable) and 
+		not gui_GetValue(varNameNoRecoil) and settingCombobox:GetValue() == 1) and 1 or 0
 
 	client_SetConVar("cl_crosshair_recoil", value, true)
 end)
 
 callbacks.Register("Draw", function()
-	if gui_GetValue(varNameRbotEnable) or not settingEnable:GetValue() then
+	local setting = settingCombobox:GetValue()
+	
+	if gui_GetValue(varNameRbotEnable) or setting == 0 then
 		return
 	end
 
@@ -65,7 +65,7 @@ callbacks.Register("Draw", function()
 	-- if localPlayer is nil then ineyePlayer is nil too
 	-- draw recoil crosshair when using no visual recoil or when using ingame crosshair and scoped
 	if not localPlayer or (not ineyePlayer or not ineyePlayer:IsAlive()) or
-		(not noVisRecoil and not settingCustom:GetValue() and not ineyePlayer:GetPropBool("m_bIsScoped")) then
+		(not noVisRecoil and setting ~= 2 and not ineyePlayer:GetPropBool("m_bIsScoped")) then
 		return
 	end
 
